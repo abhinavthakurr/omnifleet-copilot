@@ -10,14 +10,16 @@ import {
   Navigation,
   CheckCircle2,
   AlertCircle,
-  RotateCcw,
-  Sparkles,
-  TrendingUp,
+  Cpu,
+  GitBranch,
+  ShieldCheck,
 } from "lucide-react";
 
 type PlatformPreset = "zerocomm" | "superapp" | "opennet";
 
 export default function HomePage() {
+  const [activeNav, setActiveNav] = useState<string>("leak");
+
   // Interactive State for Live Dispatch Console
   const [preset, setPreset] = useState<PlatformPreset>("zerocomm");
   const [vehicle, setVehicle] = useState<"2w" | "3w" | "4w">("2w");
@@ -41,6 +43,22 @@ export default function HomePage() {
   const [adoptionPct, setAdoptionPct] = useState<number>(38);
   const [netMarginPerBatch, setNetMarginPerBatch] = useState<number>(14);
   const [currencyMode, setCurrencyMode] = useState<"INR" | "USD">("INR");
+
+  // Smooth scroll helper with exact sticky header offset (64px)
+  const scrollToSection = (sectionId: string) => {
+    setActiveNav(sectionId);
+    const el = document.getElementById(sectionId);
+    if (el) {
+      const headerOffset = 64;
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition =
+        elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
 
   // Handle Platform Preset Switching
   const handlePresetSwitch = (newPreset: PlatformPreset) => {
@@ -282,45 +300,49 @@ export default function HomePage() {
       {/* TOP MINIMAL ENTERPRISE NAVBAR */}
       <header className="sticky top-0 z-50 bg-[#080C0A]/95 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2.5 cursor-pointer">
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="flex items-center gap-2.5 cursor-pointer"
+          >
             <div className="w-5 h-5 bg-[#C8FF3D] flex items-center justify-center">
               <div className="w-2 h-2 bg-[#080C0A]" />
             </div>
             <span className="font-serif text-xl font-bold tracking-tight text-[#ECE7DA]">
               OmniFleet
             </span>
-          </a>
+          </button>
 
           <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-[#ECE7DA]/70">
-            <a href="#leak" className="hover:text-[#C8FF3D] transition-colors">
-              The leak
-            </a>
-            <a
-              href="#how-it-works"
-              className="hover:text-[#C8FF3D] transition-colors"
-            >
-              How it works
-            </a>
-            <a
-              href="#copilot"
-              className="hover:text-[#C8FF3D] transition-colors"
-            >
-              Dispatch Console
-            </a>
-            <a href="#saas" className="hover:text-[#C8FF3D] transition-colors">
-              Pass Rebate Engine
-            </a>
-            <a href="#proof" className="hover:text-[#C8FF3D] transition-colors">
-              The proof
-            </a>
+            {[
+              { id: "leak", label: "The leak" },
+              { id: "how-it-works", label: "How it works" },
+              { id: "copilot", label: "Dispatch Console" },
+              { id: "saas", label: "Pass Rebate Engine" },
+              { id: "proof", label: "The proof" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => scrollToSection(item.id)}
+                className={`cursor-pointer transition-colors ${
+                  activeNav === item.id
+                    ? "text-[#C8FF3D] font-bold"
+                    : "hover:text-[#C8FF3D]"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
 
-          <a
-            href="#copilot"
+          <button
+            type="button"
+            onClick={() => scrollToSection("copilot")}
             className="bg-[#C8FF3D] text-[#080C0A] text-xs font-bold px-4 py-2.5 rounded hover:bg-[#d6ff66] transition-colors cursor-pointer"
           >
             Deploy on Your Fleet →
-          </a>
+          </button>
         </div>
       </header>
 
@@ -373,18 +395,20 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              <a
-                href="#copilot"
+              <button
+                type="button"
+                onClick={() => scrollToSection("copilot")}
                 className="bg-[#C8FF3D] text-[#080C0A] font-bold text-sm px-6 py-3.5 rounded flex items-center gap-2 hover:bg-[#d6ff66] transition cursor-pointer"
               >
                 Launch Live Dispatch Console <ArrowRight className="w-4 h-4" />
-              </a>
-              <a
-                href="#proof"
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection("proof")}
                 className="border border-white/20 text-[#ECE7DA] font-semibold text-sm px-6 py-3.5 rounded hover:bg-white/5 transition cursor-pointer"
               >
                 Calculate Enterprise ROI
-              </a>
+              </button>
             </div>
 
             <div className="pt-4 border-t border-white/10 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[#ECE7DA]/70">
@@ -501,7 +525,7 @@ export default function HomePage() {
       {/* SECTION 3: "THE LEAK" — WARM EDITORIAL CREAM SECTION (#ECE7DA) */}
       <section
         id="leak"
-        className="bg-[#ECE7DA] text-[#080C0A] py-24 relative z-20"
+        className="bg-[#ECE7DA] text-[#080C0A] py-24 relative z-20 scroll-mt-16"
       >
         <div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-14">
           <div className="space-y-4">
@@ -569,24 +593,94 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 4: "HOW IT WORKS & LIVE DISPATCH CONSOLE" (#080C0A OBSIDIAN DARK) */}
+      {/* SECTION 4: "HOW IT WORKS" — DEDICATED 3-PILLAR SYSTEM ARCHITECTURE SECTION */}
       <section
         id="how-it-works"
-        className="bg-[#080C0A] text-[#ECE7DA] py-24 border-t border-white/10 relative z-20"
+        className="bg-[#080C0A] text-[#ECE7DA] py-24 border-t border-white/10 relative z-20 scroll-mt-16"
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-14">
-          {/* Section Header + Working Platform Switcher */}
+          <div className="max-w-3xl space-y-3">
+            <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#C8FF3D]">
+              HOW IT WORKS • SYSTEM ARCHITECTURE
+            </div>
+            <h2 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-[#ECE7DA]">
+              Detect. Chain. Rebate. Prove.
+            </h2>
+            <p className="text-base text-[#ECE7DA]/70 leading-relaxed">
+              OmniFleet sits as an intelligent spatial dispatch &amp; pricing
+              layer between your commuter rides, zero-commission restaurant
+              network, and B2B express logistics pool.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#101613] border border-[#233029] rounded-xl p-6 space-y-4">
+              <div className="w-10 h-10 rounded-lg bg-[#C8FF3D]/15 border border-[#C8FF3D]/30 flex items-center justify-center text-[#C8FF3D] font-mono font-bold">
+                01
+              </div>
+              <h3 className="font-serif text-2xl font-bold text-white">
+                H3 Liquidity Detection
+              </h3>
+              <p className="text-xs text-[#ECE7DA]/70 leading-relaxed">
+                The moment a driver completes a commuter drop in an outer
+                suburban H3 Level-8 hexagon between 11 AM and 4 PM, OmniFleet
+                evaluates <code className="text-[#C8FF3D]">E[Wait_Commuter]</code>
+                . If expected wait exceeds 12 minutes, dead-mile intervention
+                triggers automatically.
+              </p>
+            </div>
+
+            <div className="bg-[#101613] border border-[#233029] rounded-xl p-6 space-y-4">
+              <div className="w-10 h-10 rounded-lg bg-[#FF5C35]/15 border border-[#FF5C35]/30 flex items-center justify-center text-[#FF5C35] font-mono font-bold">
+                02
+              </div>
+              <h3 className="font-serif text-2xl font-bold text-white">
+                Directional 3-Hop Chaining
+              </h3>
+              <p className="text-xs text-[#ECE7DA]/70 leading-relaxed">
+                Instead of dispatching random orders, the engine queries
+                zero-commission restaurants and B2B dark stores within 500m and
+                constructs a strict directional vector chain leading back toward
+                high-demand downtown commuter surge corridors.
+              </p>
+            </div>
+
+            <div className="bg-[#101613] border border-[#233029] rounded-xl p-6 space-y-4">
+              <div className="w-10 h-10 rounded-lg bg-[#38BDF8]/15 border border-[#38BDF8]/30 flex items-center justify-center text-[#38BDF8] font-mono font-bold">
+                03
+              </div>
+              <h3 className="font-serif text-2xl font-bold text-white">
+                B2B Pass Fee Rebate
+              </h3>
+              <p className="text-xs text-[#ECE7DA]/70 leading-relaxed">
+                Every off-peak food or B2B parcel hop completed automatically
+                credits ₹8 from the merchant B2B tech fee directly toward the
+                driver&apos;s daily SaaS subscription pass—making their ride pass
+                100% free after 3 lunch drops.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 5: "DISPATCH CONSOLE" — DEDICATED INTERACTIVE LIVE DISPATCH CONSOLE */}
+      <section
+        id="copilot"
+        className="bg-[#0c120f] text-[#ECE7DA] py-24 border-t border-white/10 relative z-20 scroll-mt-16"
+      >
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-12">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="space-y-3">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#C8FF3D]">
-                HOW IT WORKS • LIVE DISPATCH INFRASTRUCTURE
+                LIVE DISPATCH CONSOLE • REAL-TIME TELEMETRY
               </div>
-              <h2 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-[#ECE7DA]">
-                Detect. Chain. Rebate. Prove.
+              <h2 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-white">
+                Interactive Multimodal Dispatch Console
               </h2>
               <p className="text-base text-[#ECE7DA]/70 max-w-2xl">
-                Select your network architecture to inspect live H3 spatial
-                routing, multimodal batching, and pass rebate telemetry:
+                Switch between network architectures below to inspect real-time
+                H3 route chaining, hourly earnings curves, and driver wallet
+                impact:
               </p>
             </div>
 
@@ -615,11 +709,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Live Dispatch Console Workspace (id="copilot") */}
-          <div
-            id="copilot"
-            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-20"
-          >
+          {/* Interactive Console Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-20">
             {/* Left 7 Cols: Controls + 24-Hour Area Curve */}
             <div className="lg:col-span-7 space-y-6">
               {/* Control Bar */}
@@ -800,7 +891,8 @@ export default function HomePage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <h3 className="text-sm font-bold text-white">
-                      24-Hour Hourly Earnings Curve: Siloed Rides vs. OmniFleet
+                      24-Hour Hourly Earnings Curve: Siloed Holdout vs.
+                      OmniFleet
                     </h3>
                     <p className="text-xs text-[#ECE7DA]/60">
                       Hover over any daypart node to inspect exact hourly
@@ -1208,15 +1300,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 5: "THE SAAS PASS ENGINE" — WARM EDITORIAL CREAM SECTION (#ECE7DA) */}
+      {/* SECTION 6: "PASS REBATE ENGINE" — WARM EDITORIAL CREAM SECTION (#ECE7DA) */}
       <section
         id="saas"
-        className="bg-[#ECE7DA] text-[#080C0A] py-24 relative z-20"
+        className="bg-[#ECE7DA] text-[#080C0A] py-24 relative z-20 scroll-mt-16"
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-14">
           <div className="max-w-3xl space-y-4">
             <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#FF5C35]">
-              DYNAMIC SAAS PASS &amp; CROSS-VERTICAL REBATES
+              PASS REBATE ENGINE • CROSS-VERTICAL SUBSIDY
             </div>
             <h2 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-[#080C0A] leading-[1.08]">
               Zero upfront risk for part-timers. 100% pass rebate when they
@@ -1417,10 +1509,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 6: "THE PROOF (ENTERPRISE ROI CALCULATOR)" — OBSIDIAN DARK SECTION */}
+      {/* SECTION 7: "THE PROOF (ENTERPRISE ROI CALCULATOR)" — OBSIDIAN DARK SECTION */}
       <section
         id="proof"
-        className="bg-[#080C0A] text-[#ECE7DA] py-24 border-t border-white/10 relative z-20"
+        className="bg-[#080C0A] text-[#ECE7DA] py-24 border-t border-white/10 relative z-20 scroll-mt-16"
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-12">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
