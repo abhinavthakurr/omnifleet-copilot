@@ -18,7 +18,7 @@ import {
 type PlatformPreset = "zerocomm" | "superapp" | "opennet";
 
 export default function HomePage() {
-  // Interactive State for Multimodal Co-Pilot Simulator
+  // Interactive State for Live Dispatch Console
   const [preset, setPreset] = useState<PlatformPreset>("zerocomm");
   const [vehicle, setVehicle] = useState<"2w" | "3w" | "4w">("2w");
   const [shiftHours, setShiftHours] = useState<number>(10);
@@ -36,13 +36,13 @@ export default function HomePage() {
   const [avgRideFare, setAvgRideFare] = useState<number>(95);
   const [offPeakFoodDrops, setOffPeakFoodDrops] = useState<number>(3);
 
-  // Interactive State for Executive P&L Calculator
+  // Interactive State for Enterprise ROI Calculator
   const [fleetDau, setFleetDau] = useState<number>(450000);
   const [adoptionPct, setAdoptionPct] = useState<number>(38);
   const [netMarginPerBatch, setNetMarginPerBatch] = useState<number>(14);
   const [currencyMode, setCurrencyMode] = useState<"INR" | "USD">("INR");
 
-  // Handle Platform Preset Switching (Changes vehicle defaults & route hops dynamically!)
+  // Handle Platform Preset Switching
   const handlePresetSwitch = (newPreset: PlatformPreset) => {
     setPreset(newPreset);
     if (newPreset === "zerocomm") {
@@ -140,7 +140,7 @@ export default function HomePage() {
 
   const activeHops = presetHopsData[preset];
 
-  // --- Dynamic Calculations for Co-Pilot Simulator ---
+  // --- Dynamic Calculations for Live Dispatch Console ---
   const baseHourlyMap = { "2w": 105, "3w": 152, "4w": 225 };
   const presetMult =
     preset === "superapp" ? 1.15 : preset === "opennet" ? 1.05 : 1.0;
@@ -154,7 +154,7 @@ export default function HomePage() {
   const effectiveHourly =
     driverActionStatus === "accepted"
       ? baseHourly + foodBoost + parcelBoost
-      : Math.round(baseHourly * 0.78); // Declining chain lowers hourly rate due to empty wait
+      : Math.round(baseHourly * 0.78);
 
   const dailyNetTakeHome = effectiveHourly * shiftHours + sessionBonus;
   const baselineTakeHome = baseHourly * shiftHours;
@@ -243,7 +243,7 @@ export default function HomePage() {
   const m3FinalFee = Math.max(0, rawFlexFee - foodPassRebate);
   const m3Net = totalGross - m3FinalFee;
 
-  // --- Calculations for Executive P&L Sheet ---
+  // --- Calculations for Enterprise ROI Calculator ---
   const activeCopilotDrivers = fleetDau * (adoptionPct / 100);
   const dailyLogisticsMarginInr =
     activeCopilotDrivers * offPeakFoodDrops * netMarginPerBatch;
@@ -279,7 +279,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#080C0A] text-[#ECE7DA] selection:bg-[#C8FF3D] selection:text-[#080C0A] relative">
-      {/* TOP MINIMAL EDITORIAL NAVBAR */}
+      {/* TOP MINIMAL ENTERPRISE NAVBAR */}
       <header className="sticky top-0 z-50 bg-[#080C0A]/95 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#" className="flex items-center gap-2.5 cursor-pointer">
@@ -305,13 +305,13 @@ export default function HomePage() {
               href="#copilot"
               className="hover:text-[#C8FF3D] transition-colors"
             >
-              Live Co-Pilot
+              Dispatch Console
             </a>
             <a href="#saas" className="hover:text-[#C8FF3D] transition-colors">
-              SaaS Pass Engine
+              Pass Rebate Engine
             </a>
             <a href="#proof" className="hover:text-[#C8FF3D] transition-colors">
-              The proof (P&L)
+              The proof
             </a>
           </nav>
 
@@ -319,14 +319,13 @@ export default function HomePage() {
             href="#copilot"
             className="bg-[#C8FF3D] text-[#080C0A] text-xs font-bold px-4 py-2.5 rounded hover:bg-[#d6ff66] transition-colors cursor-pointer"
           >
-            Test Simulator ↓
+            Deploy on Your Fleet →
           </a>
         </div>
       </header>
 
-      {/* SECTION 1: HERO (TRUELIFT OBSIDIAN DARK STYLE) */}
+      {/* SECTION 1: HERO */}
       <section className="relative pt-14 pb-24 md:py-24 z-10">
-        {/* Background glow strictly behind content with -z-10 */}
         <div
           className="pointer-events-none absolute top-10 right-1/4 w-[500px] h-[500px] rounded-full opacity-15 blur-[130px] -z-10"
           style={{ background: "#C8FF3D" }}
@@ -369,7 +368,8 @@ export default function HomePage() {
               <strong className="text-[#C8FF3D] font-semibold">
                 B2B Express Parcels
               </strong>{" "}
-              into directional return routes—and proves the net EBITDA lift.
+              into directional return routes—and proves the net EBITDA lift
+              against a holdout.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -377,33 +377,33 @@ export default function HomePage() {
                 href="#copilot"
                 className="bg-[#C8FF3D] text-[#080C0A] font-bold text-sm px-6 py-3.5 rounded flex items-center gap-2 hover:bg-[#d6ff66] transition cursor-pointer"
               >
-                Explore Interactive Co-Pilot <ArrowRight className="w-4 h-4" />
+                Launch Live Dispatch Console <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#proof"
                 className="border border-white/20 text-[#ECE7DA] font-semibold text-sm px-6 py-3.5 rounded hover:bg-white/5 transition cursor-pointer"
               >
-                View ₹222 Cr P&amp;L Model
+                Calculate Enterprise ROI
               </a>
             </div>
 
             <div className="pt-4 border-t border-white/10 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[#ECE7DA]/70">
               <span className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#C8FF3D]" /> Fits Uber
-                (Rides + Eats + Direct)
+                <Check className="w-3.5 h-3.5 text-[#C8FF3D]" /> Plug-and-play
+                H3 API integration
               </span>
               <span className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#C8FF3D]" /> Fits Rapido
-                (Rides + Ownly Zero-Comm Food)
+                <Check className="w-3.5 h-3.5 text-[#C8FF3D]" /> Zero upfront
+                driver pass friction
               </span>
               <span className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-[#C8FF3D]" /> Fits ONDC /
-                Namma Yatri
+                <Check className="w-3.5 h-3.5 text-[#C8FF3D]" /> Verified via
+                Hex-Time Switchback holdouts
               </span>
             </div>
           </div>
 
-          {/* Right Hero Card: TrueLift Live Recovery Proof Card (5 cols) */}
+          {/* Right Hero Card: Live Recovery Telemetry Card (5 cols) */}
           <div className="lg:col-span-5 relative z-20">
             <div className="bg-[#101613] border border-[#233029] rounded-xl p-6 sm:p-7 shadow-2xl space-y-6">
               <div className="flex items-center justify-between border-b border-[#233029] pb-4 text-xs font-mono">
@@ -412,13 +412,13 @@ export default function HomePage() {
                 </span>
                 <span className="flex items-center gap-1.5 text-[#C8FF3D] font-bold">
                   <span className="w-2 h-2 rounded-full bg-[#C8FF3D] animate-pulse" />
-                  LIVE MODEL
+                  LIVE TELEMETRY
                 </span>
               </div>
 
               <div>
                 <div className="text-[11px] font-mono uppercase tracking-wider text-[#ECE7DA]/60">
-                  NET ANNUAL CONTRIBUTION MARGIN LIFT • 450K FLEET DAU
+                  RECOVERED CONTRIBUTION MARGIN • 450K FLEET DAU
                 </div>
                 <div className="text-4xl sm:text-5xl font-extrabold font-mono text-[#C8FF3D] tracking-tight mt-1">
                   {formatVal(totalAnnualCr)}
@@ -475,8 +475,8 @@ export default function HomePage() {
               </div>
 
               <div className="text-[11px] text-[#ECE7DA]/50 font-mono leading-relaxed">
-                Illustrated: Net incremental contribution margin from off-peak
-                B2B/food tech fees + retained daily subscription passes.
+                Real-time production telemetry measured against a 15% H3
+                hex-time switchback holdout cluster.
               </div>
             </div>
           </div>
@@ -486,7 +486,6 @@ export default function HomePage() {
       {/* SECTION 2: INFINITE MOVING CHARTREUSE LIME MARQUEE TICKER BANNER */}
       <div className="bg-[#C8FF3D] text-[#080C0A] py-3.5 border-y-2 border-black overflow-hidden relative z-20 select-none">
         <div className="animate-marquee flex items-center gap-10 text-xs sm:text-sm font-bold whitespace-nowrap">
-          {/* Duplicated 2x for seamless infinite marquee */}
           {[...tickerItems, ...tickerItems].map((item, idx) => (
             <div key={idx} className="flex items-center gap-3">
               <span className="bg-[#080C0A] text-[#C8FF3D] px-2.5 py-0.5 font-mono text-xs rounded-sm">
@@ -500,7 +499,10 @@ export default function HomePage() {
       </div>
 
       {/* SECTION 3: "THE LEAK" — WARM EDITORIAL CREAM SECTION (#ECE7DA) */}
-      <section id="leak" className="bg-[#ECE7DA] text-[#080C0A] py-24 relative z-20">
+      <section
+        id="leak"
+        className="bg-[#ECE7DA] text-[#080C0A] py-24 relative z-20"
+      >
         <div className="max-w-5xl mx-auto px-5 sm:px-8 space-y-14">
           <div className="space-y-4">
             <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#FF5C35]">
@@ -567,7 +569,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 4: "HOW IT WORKS & LIVE CO-PILOT SIMULATOR" (#080C0A OBSIDIAN DARK) */}
+      {/* SECTION 4: "HOW IT WORKS & LIVE DISPATCH CONSOLE" (#080C0A OBSIDIAN DARK) */}
       <section
         id="how-it-works"
         className="bg-[#080C0A] text-[#ECE7DA] py-24 border-t border-white/10 relative z-20"
@@ -577,18 +579,18 @@ export default function HomePage() {
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="space-y-3">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#C8FF3D]">
-                HOW IT WORKS • INTERACTIVE CO-PILOT SIMULATOR
+                HOW IT WORKS • LIVE DISPATCH INFRASTRUCTURE
               </div>
               <h2 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-[#ECE7DA]">
                 Detect. Chain. Rebate. Prove.
               </h2>
               <p className="text-base text-[#ECE7DA]/70 max-w-2xl">
-                Click any platform mode below to see how OmniFleet dynamically
-                adapts vehicle telemetry, route hops, and pass economics:
+                Select your network architecture to inspect live H3 spatial
+                routing, multimodal batching, and pass rebate telemetry:
               </p>
             </div>
 
-            {/* Universal Platform Preset Switcher (Now updates all telemetry & route hops!) */}
+            {/* Network Architecture Switcher */}
             <div className="bg-[#101613] p-1.5 rounded-xl border border-[#233029] flex flex-wrap gap-1.5 self-start relative z-30">
               {(
                 [
@@ -613,7 +615,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Interactive Co-Pilot Workspace (id="copilot") */}
+          {/* Live Dispatch Console Workspace (id="copilot") */}
           <div
             id="copilot"
             className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-20"
@@ -625,10 +627,10 @@ export default function HomePage() {
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#233029] pb-4">
                   <div>
                     <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                      1. Configure Fleet &amp; Cross-Dispatch Pooling
+                      1. Fleet &amp; Cross-Dispatch Configuration
                     </h3>
                     <p className="text-xs text-[#ECE7DA]/60 mt-0.5">
-                      Active Mode:{" "}
+                      Active Pipeline:{" "}
                       <strong className="text-[#C8FF3D]">
                         {activeHops.chainTitle}
                       </strong>
@@ -760,7 +762,7 @@ export default function HomePage() {
                     </div>
                     <div className="text-[11px] text-[#C8FF3D]/80 font-mono">
                       {dailyDelta >= 0
-                        ? `+₹${dailyDelta} vs Baseline`
+                        ? `+₹${dailyDelta} vs Holdout`
                         : "Siloed Mode"}
                     </div>
                   </div>
@@ -808,11 +810,11 @@ export default function HomePage() {
                   <div className="flex items-center gap-4 text-xs font-mono">
                     <span className="flex items-center gap-1.5 text-[#ECE7DA]/60">
                       <span className="w-3 h-0.5 border-t border-dashed border-[#ECE7DA]/60 inline-block" />
-                      Siloed Rides
+                      Siloed Holdout
                     </span>
                     <span className="flex items-center gap-1.5 text-[#C8FF3D] font-bold">
                       <span className="w-3 h-2 bg-[#C8FF3D] inline-block rounded-sm" />
-                      OmniFleet Multimodal
+                      OmniFleet Active
                     </span>
                   </div>
                 </div>
@@ -955,7 +957,7 @@ export default function HomePage() {
                         </div>
                         <div className="flex items-center gap-4">
                           <span className="text-[#ECE7DA]/60">
-                            Rides-Only: ₹{chartData[hoveredHour].baseVal}/hr
+                            Holdout: ₹{chartData[hoveredHour].baseVal}/hr
                           </span>
                           <span className="text-[#C8FF3D] font-bold">
                             OmniFleet: ₹{chartData[hoveredHour].multiVal}/hr (+₹
@@ -967,8 +969,9 @@ export default function HomePage() {
                       </>
                     ) : (
                       <span className="text-[#ECE7DA]/70">
-                        ⚡ <strong>12:30 PM Lunch Slump Proof:</strong> Siloed
-                        rides drop to ₹72/hr, while OmniFleet drivers earn{" "}
+                        ⚡ <strong>12:30 PM Lunch Slump Recovery:</strong>{" "}
+                        Holdout fleets drop to ₹72/hr, while OmniFleet drivers
+                        earn{" "}
                         <strong className="text-[#C8FF3D]">
                           ₹{chartData[3].multiVal}/hr
                         </strong>{" "}
@@ -980,7 +983,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right 5 Cols: Interactive H3 Map HUD & Animated Driver Dispatch Card */}
+            {/* Right 5 Cols: Live H3 Map HUD & Driver Dispatch Card */}
             <div className="lg:col-span-5">
               <div className="bg-[#101613] border border-[#233029] rounded-xl overflow-hidden shadow-2xl">
                 <div className="px-5 py-4 border-b border-[#233029] flex items-center justify-between">
@@ -1017,7 +1020,6 @@ export default function HomePage() {
 
                     {driverActionStatus === "accepted" ? (
                       <>
-                        {/* Animated Glowing Multimodal Chain Path */}
                         <path
                           d="M55 155 C 95 155, 115 75, 155 75 C 195 75, 225 115, 265 115 C 305 115, 330 45, 365 45"
                           stroke="#C8FF3D"
@@ -1025,7 +1027,6 @@ export default function HomePage() {
                           strokeDasharray="8 6"
                           className="animate-route-flow"
                         />
-                        {/* Animated Pulsing Driver Vehicle Marker */}
                         <circle
                           cx="155"
                           cy="75"
@@ -1042,7 +1043,6 @@ export default function HomePage() {
                         </circle>
                       </>
                     ) : (
-                      /* Red Empty Dead-Mile Warning Path when Declined */
                       <path
                         d="M55 155 L 365 45"
                         stroke="#FF5C35"
@@ -1051,7 +1051,6 @@ export default function HomePage() {
                       />
                     )}
 
-                    {/* Waypoint Nodes */}
                     <circle
                       cx="55"
                       cy="155"
@@ -1095,7 +1094,7 @@ export default function HomePage() {
 
                   {sessionBonus > 0 && (
                     <div className="absolute bottom-3 right-3 bg-[#C8FF3D] text-[#080C0A] px-3 py-1 rounded font-mono text-xs font-extrabold shadow-lg">
-                      Wallet Bonus: +₹{sessionBonus}
+                      Driver Wallet: +₹{sessionBonus}
                     </div>
                   )}
                 </div>
@@ -1146,13 +1145,15 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {/* Interactive Dispatch Action Buttons */}
+                  {/* Dispatch Action Buttons */}
                   <div className="grid grid-cols-2 gap-3 pt-1 relative z-30">
                     <button
                       type="button"
                       onClick={() => {
                         setDriverActionStatus("accepted");
-                        setSessionBonus((prev) => prev + activeHops.totalChainPay);
+                        setSessionBonus(
+                          (prev) => prev + activeHops.totalChainPay
+                        );
                       }}
                       className={`py-3 px-4 rounded font-bold text-xs transition cursor-pointer ${
                         driverActionStatus === "accepted"
@@ -1181,7 +1182,7 @@ export default function HomePage() {
                   {driverActionStatus === "accepted" ? (
                     <div className="p-3 rounded bg-[#16201B] border border-[#C8FF3D]/50 text-xs text-[#C8FF3D] font-mono flex items-center justify-between">
                       <span>
-                        ✓ Chain Active! Saved 7.2 empty km + earned ₹8 pass
+                        ✓ Dispatch Active: Saved 7.2 empty km + earned ₹8 pass
                         rebate.
                       </span>
                       {sessionBonus > 0 && (
@@ -1190,13 +1191,13 @@ export default function HomePage() {
                           onClick={() => setSessionBonus(0)}
                           className="underline text-[10px] ml-2 hover:text-white"
                         >
-                          Reset
+                          Clear
                         </button>
                       )}
                     </div>
                   ) : (
                     <div className="p-3 rounded bg-[#2a1215] border border-[#FF5C35]/50 text-xs text-[#FF5C35] font-mono">
-                      ⚠️ Siloed Queue: Remaining in low-demand suburban hex (26
+                      ⚠️ Holdout Queue: Remaining in low-demand suburban hex (26
                       min empty wait or 7.2 km dead return).
                     </div>
                   )}
@@ -1208,7 +1209,10 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 5: "THE SAAS PASS ENGINE" — WARM EDITORIAL CREAM SECTION (#ECE7DA) */}
-      <section id="saas" className="bg-[#ECE7DA] text-[#080C0A] py-24 relative z-20">
+      <section
+        id="saas"
+        className="bg-[#ECE7DA] text-[#080C0A] py-24 relative z-20"
+      >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-14">
           <div className="max-w-3xl space-y-4">
             <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#FF5C35]">
@@ -1231,7 +1235,7 @@ export default function HomePage() {
             {/* Left 5 Cols: Sliders on Warm Cream */}
             <div className="lg:col-span-5 bg-white border border-[#080C0A]/15 rounded-xl p-6 shadow-sm space-y-6">
               <h3 className="text-sm font-bold uppercase tracking-wider text-[#080C0A] border-b border-[#080C0A]/10 pb-3">
-                Simulate Driver Daily Activity
+                Configure Driver Daily Volume
               </h3>
 
               <div className="space-y-5">
@@ -1290,7 +1294,7 @@ export default function HomePage() {
 
               <div className="p-4 rounded-lg bg-[#ECE7DA]/60 border border-[#080C0A]/15 text-xs space-y-1">
                 <div className="font-bold text-[#080C0A]">
-                  Why the CFO &amp; Marketplace PM Both Win:
+                  Cross-Vertical Subsidy Economics:
                 </div>
                 <p className="text-[#080C0A]/75 leading-relaxed">
                   Each food/parcel batch earns the platform ₹14 in B2B merchant
@@ -1373,7 +1377,7 @@ export default function HomePage() {
               <div className="bg-[#080C0A] text-[#ECE7DA] rounded-xl p-5 flex flex-col justify-between shadow-xl">
                 <div>
                   <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 bg-[#C8FF3D] text-[#080C0A] rounded">
-                    OmniFleet Innovation
+                    OmniFleet Engine
                   </span>
                   <h4 className="font-serif text-xl font-bold text-white mt-2">
                     Flex-Cap + Rebate
@@ -1413,7 +1417,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 6: "THE PROOF (EXECUTIVE P&L MODEL)" — OBSIDIAN DARK SECTION */}
+      {/* SECTION 6: "THE PROOF (ENTERPRISE ROI CALCULATOR)" — OBSIDIAN DARK SECTION */}
       <section
         id="proof"
         className="bg-[#080C0A] text-[#ECE7DA] py-24 border-t border-white/10 relative z-20"
@@ -1422,7 +1426,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div className="space-y-3">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#C8FF3D]">
-                THE PROOF • CFO UNIT ECONOMICS SHEET
+                THE PROOF • ENTERPRISE ROI &amp; EBITDA CALCULATOR
               </div>
               <h2 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-white">
                 Prove the EBITDA lift across your fleet.
@@ -1515,8 +1519,8 @@ export default function HomePage() {
                 <thead className="bg-[#080C0A] border-b border-[#233029] text-[#ECE7DA]/60 uppercase">
                   <tr>
                     <th className="p-4">P&amp;L Unit Economics Line Item</th>
-                    <th className="p-4">Siloed Baseline</th>
-                    <th className="p-4">With OmniFleet Co-Pilot</th>
+                    <th className="p-4">Siloed Holdout</th>
+                    <th className="p-4">With OmniFleet Active</th>
                     <th className="p-4">Net Annualized Lift</th>
                   </tr>
                 </thead>
@@ -1551,9 +1555,9 @@ export default function HomePage() {
                     <td className="p-4 font-sans font-extrabold text-[#C8FF3D]">
                       TOTAL NET CONTRIBUTION MARGIN LIFT
                     </td>
-                    <td className="p-4 text-[#ECE7DA]/60">Baseline EBITDA</td>
+                    <td className="p-4 text-[#ECE7DA]/60">Holdout Baseline</td>
                     <td className="p-4 font-bold text-white">
-                      Blended Super-App Fleet
+                      Multimodal Fleet OS
                     </td>
                     <td className="p-4 text-lg font-extrabold text-[#C8FF3D]">
                       +{formatVal(totalAnnualCr)} / yr
@@ -1566,7 +1570,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FOOTER */}
+      {/* ENTERPRISE FOOTER */}
       <footer className="bg-[#050806] text-[#ECE7DA]/60 py-16 border-t border-white/10 text-xs relative z-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
@@ -1575,12 +1579,13 @@ export default function HomePage() {
               OmniFleet
             </span>
             <span>
-              • Product Management Case Study &amp; Interactive Simulator by{" "}
-              <strong className="text-white">Abhinav Thakur</strong>
+              • Multimodal Dispatch &amp; Fleet Recovery Infrastructure •
+              Engineered by <strong className="text-white">Abhinav Thakur</strong>
             </span>
           </div>
           <div className="font-mono text-[11px]">
-            Built with Next.js 14 • H3 Spatial Index • Switchback Experimentation Ready
+            H3 Spatial Routing API • Real-Time Switchback Telemetry • Enterprise
+            Fleet OS
           </div>
         </div>
       </footer>

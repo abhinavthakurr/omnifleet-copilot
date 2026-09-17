@@ -26,9 +26,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OmniFleet — Multimodal Fleet Recovery & SaaS Pass Engine",
+  title: "OmniFleet — Multimodal Dispatch & Zero-Commission Fleet Recovery",
   description:
-    "Your fleet is bleeding out between 11 AM and 4 PM. We recover the dead miles via Zero-Commission Food & B2B Parcel chaining, and prove the EBITDA lift.",
+    "Your fleet is bleeding out between 11 AM and 4 PM. OmniFleet recovers empty dead miles via directional food & B2B parcel chaining, and proves the EBITDA lift.",
 };
 
 export default function RootLayout({
