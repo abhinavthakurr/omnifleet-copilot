@@ -7,7 +7,39 @@
     background-color: #080C0A;
     color: #ECE7DA;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
+}
+
+/* Infinite Smooth Marquee Ticker Animation */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Animated SVG Route Dash Flow */
+@keyframes routeFlow {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+.animate-route-flow {
+  animation: routeFlow 1.4s linear infinite;
 }
 
 /* Custom subtle range slider styling */
@@ -19,13 +51,13 @@ input[type="range"] {
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
   height: 6px;
   border-radius: 999px;
 }
 
 .cream-slider::-webkit-slider-runnable-track {
-  background: rgba(8, 12, 10, 0.15) !important;
+  background: rgba(8, 12, 10, 0.18) !important;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -33,14 +65,15 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   margin-top: -5px;
   background-color: #C8FF3D;
-  height: 16px;
-  width: 16px;
+  height: 18px;
+  width: 18px;
   border-radius: 999px;
   border: 2px solid #080C0A;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: transform 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
+  background-color: #d8ff66;
 }
