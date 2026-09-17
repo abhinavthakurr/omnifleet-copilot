@@ -8,13 +8,12 @@ import SubscriptionEngine from "@/components/SubscriptionEngine";
 import HexMapVisualizer from "@/components/HexMapVisualizer";
 import UnitEconomicsSheet from "@/components/UnitEconomicsSheet";
 import {
-  Zap,
-  Layers,
+  Sliders,
   CreditCard,
-  BarChart3,
-  Globe2,
-  Sparkles,
-  CheckCircle,
+  Map,
+  BarChart2,
+  Layers,
+  ArrowUpRight,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -23,151 +22,171 @@ export default function HomePage() {
   >("copilot");
   const [preset, setPreset] = useState<PlatformPreset>("superapp");
 
-  const presetDescriptions: Record<
+  const presetMeta: Record<
     PlatformPreset,
-    { title: string; subtitle: string; badge: string }
+    { label: string; scope: string; description: string }
   > = {
     superapp: {
-      title: "Global Mobility + Food Super-App Architecture",
-      subtitle:
-        "Cross-dispatching Commuter Rides, Food Delivery (Eats/Ownly model), and B2B Express Parcels under a unified driver supply pool.",
-      badge: "Fits: Uber (Rides + Eats + Direct) • Grab • Bolt",
+      label: "Super-App Mode",
+      scope: "Uber (Rides + Eats + Direct) • Grab • Bolt",
+      description:
+        "Cross-dispatching commuter rides, restaurant delivery batches, and B2B express logistics across a unified driver supply pool.",
     },
     zerocomm: {
-      title: "Zero-Commission SaaS Subscription & Low-Take Food Network",
-      subtitle:
-        "Monetizing 2W/3W/4W fleets via Daily Subscription Passes while subsidizing driver pass fees through zero-commission restaurant delivery batches.",
-      badge: "Fits: Rapido (Rides + Ownly Food) • Ola • Swiggy/Zomato Fleet",
+      label: "Zero-Commission SaaS",
+      scope: "Rapido (Rides + Ownly Food) • Ola • Swiggy/Zomato Fleet",
+      description:
+        "Monetizing 2W/3W/4W fleets via daily SaaS passes while subsidizing driver pass fees through zero-commission restaurant delivery batches.",
     },
     opennet: {
-      title: "Decentralized Open Mobility & Logistics Grid",
-      subtitle:
+      label: "Open Network Grid",
+      scope: "ONDC Protocol • Namma Yatri • Beckn Mobility",
+      description:
         "Direct driver-to-consumer fare settlement paired with ₹0-upfront pay-as-you-go micro-passes and open retail logistics pooling.",
-      badge: "Fits: ONDC Network • Namma Yatri • Beckn Protocol",
     },
   };
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-      {/* Top Executive Header */}
-      <div className="bg-gray-900/90 border border-gray-800 rounded-3xl p-5 sm:p-6 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-5 border-b border-gray-800">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="px-3 py-0.5 text-xs font-extrabold uppercase tracking-wider rounded-full bg-indigo-500 text-white flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> PM Portfolio Case Study
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900">
+      {/* Enterprise Top Navigation Bar */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+          {/* Brand & Breadcrumb */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-sm tracking-tighter">
+              OF
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-bold tracking-tight text-slate-900">
+                OmniFleet OS
               </span>
-              <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
-                {presetDescriptions[preset].badge}
+              <span className="text-slate-300">/</span>
+              <span className="text-slate-500 font-medium hidden sm:inline">
+                Multimodal Dispatch & SaaS Pass Simulator
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white">
-              OmniFleet AI: Multimodal Driver Co-Pilot & SaaS Pass Engine
-            </h1>
-            <p className="text-xs sm:text-sm text-gray-400 mt-1 max-w-3xl">
-              {presetDescriptions[preset].subtitle}
-            </p>
           </div>
 
-          {/* Universal Platform Architecture Preset Switcher */}
-          <div className="bg-gray-950 p-2 rounded-2xl border border-gray-800 shrink-0">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-2 mb-1.5 flex items-center gap-1">
-              <Globe2 className="w-3 h-3 text-indigo-400" /> Select Target Platform Mode:
-            </div>
-            <div className="grid grid-cols-3 gap-1.5">
-              <button
-                onClick={() => setPreset("superapp")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                  preset === "superapp"
-                    ? "bg-indigo-600 text-white shadow"
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                Super-App
-              </button>
-              <button
-                onClick={() => setPreset("zerocomm")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                  preset === "zerocomm"
-                    ? "bg-amber-500 text-gray-950 shadow"
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                Zero-Comm SaaS
-              </button>
-              <button
-                onClick={() => setPreset("opennet")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                  preset === "opennet"
-                    ? "bg-emerald-500 text-gray-950 shadow"
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                Open Network
-              </button>
+          {/* Segmented Control for Platform Architecture */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-slate-500 hidden md:inline">
+              Architecture Preset:
+            </span>
+            <div className="inline-flex p-1 rounded-lg bg-slate-100 border border-slate-200/80">
+              {(["superapp", "zerocomm", "opennet"] as PlatformPreset[]).map(
+                (key) => (
+                  <button
+                    key={key}
+                    onClick={() => setPreset(key)}
+                    className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                      preset === key
+                        ? "bg-white text-slate-900 shadow-sm border border-slate-200/60"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {presetMeta[key].label}
+                  </button>
+                )
+              )}
             </div>
           </div>
         </div>
+      </header>
 
-        {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 pt-4">
-          <button
-            onClick={() => setActiveTab("copilot")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
-              activeTab === "copilot"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "bg-gray-950 text-gray-400 hover:text-white border border-gray-800"
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5" />
-            1. Multimodal Co-Pilot & Food/Parcel Blending
-          </button>
+      {/* Executive Context & Sub-Navigation */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6">
+            <div className="space-y-1.5 max-w-3xl">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                <span>Target Ecosystem Fit:</span>
+                <span className="font-semibold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  {presetMeta[preset].scope}
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+                Multimodal Fleet Utilization & Dynamic Subscription Engine
+              </h1>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {presetMeta[preset].description}
+              </p>
+            </div>
 
-          <button
-            onClick={() => setActiveTab("saas")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
-              activeTab === "saas"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "bg-gray-950 text-gray-400 hover:text-white border border-gray-800"
-            }`}
-          >
-            <CreditCard className="w-3.5 h-3.5" />
-            2. Dynamic SaaS Pass & Food Rebate Engine
-          </button>
+            <div className="shrink-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-4">
+              <div>
+                <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                  Simulated Annual Impact
+                </div>
+                <div className="text-lg font-extrabold text-slate-900 font-mono tabular-nums">
+                  +₹222.4 Cr{" "}
+                  <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    +$26.2M EBITDA
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <button
-            onClick={() => setActiveTab("hexmap")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
-              activeTab === "hexmap"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "bg-gray-950 text-gray-400 hover:text-white border border-gray-800"
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            3. H3 Spatial Hex Map & Dead-Mile Dispatch
-          </button>
+          {/* Clean Enterprise Underline Tabs */}
+          <nav className="flex gap-8 -mb-px overflow-x-auto">
+            <button
+              onClick={() => setActiveTab("copilot")}
+              className={`flex items-center gap-2 pb-3.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === "copilot"
+                  ? "border-slate-900 text-slate-900"
+                  : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
+              }`}
+            >
+              <Sliders className="w-4 h-4" />
+              1. Multimodal Co-Pilot & Dispatch
+            </button>
 
-          <button
-            onClick={() => setActiveTab("pnl")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
-              activeTab === "pnl"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "bg-gray-950 text-gray-400 hover:text-white border border-gray-800"
-            }`}
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            4. Executive Unit Economics & P&L Sheet
-          </button>
+            <button
+              onClick={() => setActiveTab("saas")}
+              className={`flex items-center gap-2 pb-3.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === "saas"
+                  ? "border-slate-900 text-slate-900"
+                  : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
+              }`}
+            >
+              <CreditCard className="w-4 h-4" />
+              2. Dynamic SaaS Pass & Food Rebates
+            </button>
+
+            <button
+              onClick={() => setActiveTab("hexmap")}
+              className={`flex items-center gap-2 pb-3.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === "hexmap"
+                  ? "border-slate-900 text-slate-900"
+                  : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
+              }`}
+            >
+              <Map className="w-4 h-4" />
+              3. H3 Spatial Liquidity & Switchback Map
+            </button>
+
+            <button
+              onClick={() => setActiveTab("pnl")}
+              className={`flex items-center gap-2 pb-3.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === "pnl"
+                  ? "border-slate-900 text-slate-900"
+                  : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
+              }`}
+            >
+              <BarChart2 className="w-4 h-4" />
+              4. Executive Unit Economics & P&L Sheet
+            </button>
+          </nav>
         </div>
       </div>
 
-      {/* Active Tab Content */}
-      <div>
+      {/* Main Content Workspace */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
         {activeTab === "copilot" && <MultimodalSimulator preset={preset} />}
         {activeTab === "saas" && <SubscriptionEngine />}
         {activeTab === "hexmap" && <HexMapVisualizer />}
         {activeTab === "pnl" && <UnitEconomicsSheet />}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MapPin, Navigation, Layers, ArrowRight, Activity } from "lucide-react";
+import { Layers, Activity, ArrowRight, CheckCircle2 } from "lucide-react";
 
 interface HexZone {
   id: string;
@@ -9,7 +9,7 @@ interface HexZone {
   type: "Tech Park" | "Restaurant Hub" | "CBD Core" | "Suburban Residential";
   passengerDemand: "Low" | "Medium" | "High";
   foodParcelSupply: "High" | "Very High" | "Medium";
-  avgWaitRidesOnly: number; // mins
+  avgWaitRidesOnly: number;
   deadMileRiskKm: number;
   recommendedChain: string;
   netHourlyBoost: number;
@@ -70,71 +70,95 @@ export default function HexMapVisualizer() {
   const [selectedHex, setSelectedHex] = useState<HexZone>(HEX_ZONES[0]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left 7 Cols: Interactive Hexagonal Cluster Grid */}
-      <div className="lg:col-span-7 bg-gray-900/90 border border-gray-800 rounded-2xl p-5">
-        <div className="flex items-center justify-between mb-4">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Left 7 Cols: Interactive H3 Hex Grid */}
+      <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-5">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Layers className="w-4 h-4 text-indigo-400" />
-              H3 Spatial Index: Dead-Mile & Multimodal Liquidity Map
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+              H3 Spatial Index: Dead-Mile & Liquidity Clusters
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Click any H3 Hex Cluster to inspect off-peak supply/demand imbalance and Co-Pilot routing logic.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Select an H3 Level-8 hexagon to inspect off-peak supply/demand imbalance and Co-Pilot dispatch rules
             </p>
           </div>
-          <span className="text-xs font-mono px-2.5 py-1 rounded bg-gray-950 border border-gray-800 text-indigo-300">
-            Resolution: H3 Level-8
+          <span className="font-mono text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-200">
+            H3 Res-8
           </span>
         </div>
 
-        {/* Hex Grid Visualization */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {HEX_ZONES.map((hex) => {
             const isSelected = selectedHex.id === hex.id;
             return (
               <button
                 key={hex.id}
                 onClick={() => setSelectedHex(hex)}
-                className={`p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden ${
+                className={`p-4 rounded-xl border text-left transition-all ${
                   isSelected
-                    ? "bg-indigo-950/50 border-indigo-500 shadow-lg"
-                    : "bg-gray-950/80 border-gray-800 hover:border-gray-700"
+                    ? "bg-slate-900 border-slate-900 text-white shadow-md"
+                    : "bg-slate-50/80 border-slate-200 text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-xs font-bold text-indigo-400">
+                  <span
+                    className={`font-mono text-xs font-bold ${
+                      isSelected ? "text-slate-300" : "text-slate-500"
+                    }`}
+                  >
                     {hex.id}
                   </span>
                   <span
-                    className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
-                      hex.passengerDemand === "Low"
-                        ? "bg-red-500/15 text-red-400"
+                    className={`px-2 py-0.5 text-[10px] font-bold rounded ${
+                      isSelected
+                        ? "bg-slate-800 text-white"
+                        : hex.passengerDemand === "Low"
+                        ? "bg-red-50 text-red-700 border border-red-200"
                         : hex.passengerDemand === "Medium"
-                        ? "bg-amber-500/15 text-amber-400"
-                        : "bg-emerald-500/15 text-emerald-400"
+                        ? "bg-amber-50 text-amber-700 border border-amber-200"
+                        : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                     }`}
                   >
-                    Passenger Demand: {hex.passengerDemand}
+                    Demand: {hex.passengerDemand}
                   </span>
                 </div>
 
-                <h3 className="text-sm font-bold text-white">{hex.name}</h3>
+                <h3 className="text-sm font-bold">{hex.name}</h3>
 
-                <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-gray-800/80 text-xs">
+                <div
+                  className={`grid grid-cols-2 gap-2 mt-3 pt-3 border-t text-xs ${
+                    isSelected ? "border-slate-800" : "border-slate-200"
+                  }`}
+                >
                   <div>
-                    <span className="text-gray-400 block text-[10px]">
-                      Rides-Only Wait Time
+                    <span
+                      className={`block text-[10px] ${
+                        isSelected ? "text-slate-400" : "text-slate-500"
+                      }`}
+                    >
+                      Rides-Only Idle Wait
                     </span>
-                    <span className="font-bold text-red-400">
-                      {hex.avgWaitRidesOnly} mins idle
+                    <span
+                      className={`font-mono font-bold ${
+                        isSelected ? "text-amber-400" : "text-red-600"
+                      }`}
+                    >
+                      {hex.avgWaitRidesOnly} mins
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block text-[10px]">
-                      Food/Parcel Liquidity
+                    <span
+                      className={`block text-[10px] ${
+                        isSelected ? "text-slate-400" : "text-slate-500"
+                      }`}
+                    >
+                      Food/Parcel Density
                     </span>
-                    <span className="font-bold text-emerald-400">
+                    <span
+                      className={`font-mono font-bold ${
+                        isSelected ? "text-emerald-400" : "text-emerald-700"
+                      }`}
+                    >
                       {hex.foodParcelSupply}
                     </span>
                   </div>
@@ -144,68 +168,67 @@ export default function HexMapVisualizer() {
           })}
         </div>
 
-        <div className="p-3.5 rounded-xl bg-gray-950 border border-gray-800 text-xs text-gray-300 flex items-center justify-between">
-          <span>
-            💡 <strong>Algorithm Rule:</strong> Trigger Multimodal Chain when{" "}
-            <code className="text-indigo-400">E[Wait_Passenger] &gt; 12 mins</code> AND{" "}
-            <code className="text-amber-400">Food_Parcel_Density &gt; 0.6</code>
-          </span>
+        <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700">
+          <strong>Dispatch Trigger Condition:</strong> Activate directional food/parcel chaining when{" "}
+          <code className="font-mono font-bold text-slate-900">
+            E[Wait_Passenger] &gt; 12 mins
+          </code>{" "}
+          and local dark-store/restaurant order density exceeds{" "}
+          <code className="font-mono font-bold text-slate-900">0.6 orders/hex</code>.
         </div>
       </div>
 
-      {/* Right 5 Cols: Selected Hex Telemetry & Action Inspector */}
-      <div className="lg:col-span-5 bg-gray-900/90 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-gray-800 pb-3">
-            <div>
-              <span className="text-xs font-mono text-indigo-400 font-bold">
-                SELECTED HEX TELEMETRY
-              </span>
-              <h3 className="text-lg font-extrabold text-white mt-0.5">
-                {selectedHex.name}
-              </h3>
-            </div>
-            <Activity className="w-5 h-5 text-emerald-400" />
+      {/* Right 5 Cols: Selected Hex Inspector & Switchback Plan */}
+      <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-5">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <span className="font-mono text-xs font-bold text-slate-500 uppercase">
+              Selected Hex Telemetry
+            </span>
+            <h3 className="text-base font-extrabold text-slate-900 mt-0.5">
+              {selectedHex.name}
+            </h3>
           </div>
+          <Activity className="w-5 h-5 text-slate-700" />
+        </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 rounded-xl bg-gray-950 border border-gray-800">
-              <div className="text-xs text-gray-400">Empty Dead-Mile Risk</div>
-              <div className="text-lg font-bold text-red-400 mt-0.5">
-                {selectedHex.deadMileRiskKm} km
-              </div>
-              <div className="text-[10px] text-gray-400">
-                If driver returns empty to city center
-              </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="text-xs text-slate-500">Empty Dead-Mile Risk</div>
+            <div className="text-xl font-extrabold font-mono text-slate-900 mt-1">
+              {selectedHex.deadMileRiskKm} km
             </div>
-
-            <div className="p-3 rounded-xl bg-gray-950 border border-gray-800">
-              <div className="text-xs text-gray-400">Co-Pilot Net Hourly Lift</div>
-              <div className="text-lg font-bold text-emerald-400 mt-0.5">
-                +₹{selectedHex.netHourlyBoost}/hr
-              </div>
-              <div className="text-[10px] text-gray-400">
-                Via directional parcel/food chaining
-              </div>
+            <div className="text-[11px] text-red-600 font-medium mt-0.5">
+              Uncompensated return distance
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/40 space-y-2">
-            <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
-              ⚡ Automated Co-Pilot Dispatch Chain
+          <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="text-xs text-slate-500">Co-Pilot Hourly Lift</div>
+            <div className="text-xl font-extrabold font-mono text-emerald-700 mt-1">
+              +₹{selectedHex.netHourlyBoost}/hr
             </div>
-            <p className="text-xs text-white leading-relaxed font-medium">
-              {selectedHex.recommendedChain}
-            </p>
+            <div className="text-[11px] text-emerald-700 font-medium mt-0.5">
+              Net driver take-home gain
+            </div>
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-gray-800 text-xs text-gray-400 space-y-1.5">
-          <div className="font-bold text-gray-200">
-            Switchback Experiment Design Note:
+        <div className="p-4 rounded-lg bg-slate-900 text-white space-y-2">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            Automated Directional Chain
           </div>
-          <p className="leading-relaxed">
-            To measure true causal lift without network interference (SUTVA), randomize this H3 Hex Cluster into <strong>2-Hour Treatment vs Control Switchback Windows</strong> during 11 AM – 4 PM.
+          <p className="text-xs leading-relaxed font-medium text-slate-100">
+            {selectedHex.recommendedChain}
+          </p>
+        </div>
+
+        <div className="pt-3 border-t border-slate-100 text-xs space-y-1.5">
+          <div className="font-bold text-slate-900">
+            Causal Inference & Switchback Experimentation
+          </div>
+          <p className="text-slate-600 leading-relaxed">
+            Because two-sided mobility marketplaces suffer from network spillover (SUTVA violation), this H3 cluster is evaluated using <strong>2-hour time-space switchback blocks</strong> during 11:00 – 16:00 rather than naive driver-level A/B splits.
           </p>
         </div>
       </div>

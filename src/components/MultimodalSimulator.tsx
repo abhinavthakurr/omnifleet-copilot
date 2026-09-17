@@ -2,16 +2,16 @@
 
 import React, { useState } from "react";
 import {
-  Zap,
   Utensils,
   Package,
   Navigation,
-  Clock,
-  TrendingUp,
   CheckCircle2,
-  AlertTriangle,
-  ShieldCheck,
-  Smartphone,
+  AlertCircle,
+  SlidersHorizontal,
+  ArrowRight,
+  Clock,
+  Fuel,
+  TrendingUp,
 } from "lucide-react";
 
 export type PlatformPreset = "superapp" | "zerocomm" | "opennet";
@@ -31,12 +31,11 @@ export default function MultimodalSimulator({ preset }: Props) {
     "idle" | "accepted" | "declined"
   >("idle");
 
-  // Dynamic Calculations based on Vehicle, City, and Toggles
+  // Calculations
   const baseHourlyMap = { "2w": 105, "3w": 148, "4w": 215 };
   const baseHourly =
     baseHourlyMap[vehicle] * (cityTier === "metro" ? 1.12 : 0.92);
 
-  // Boost from Zero-Commission Food (Lunch/Dinner) & B2B Parcels (Off-peak return routes)
   const foodBoost = coPilotActive && foodBatchEnabled ? baseHourly * 0.18 : 0;
   const parcelBoost = coPilotActive && b2bParcelEnabled ? baseHourly * 0.14 : 0;
 
@@ -76,7 +75,7 @@ export default function MultimodalSimulator({ preset }: Props) {
     },
     {
       time: "14:30 – 17:00",
-      label: "Afternoon Slump (B2B & Dark Store Restock)",
+      label: "Afternoon Trough (B2B Express & Dark Stores)",
       rideShare: 30,
       foodShare: coPilotActive && foodBatchEnabled ? 15 : 0,
       parcelShare: coPilotActive && b2bParcelEnabled ? 55 : 0,
@@ -92,7 +91,7 @@ export default function MultimodalSimulator({ preset }: Props) {
     },
     {
       time: "20:30 – 23:00",
-      label: "Dinner & Late-Night Return Trip Batching",
+      label: "Dinner & Late-Night Return Batching",
       rideShare: 45,
       foodShare: coPilotActive && foodBatchEnabled ? 45 : 0,
       parcelShare: coPilotActive && b2bParcelEnabled ? 10 : 0,
@@ -101,258 +100,281 @@ export default function MultimodalSimulator({ preset }: Props) {
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left 7 Cols: Controls & Hourly Blending Analytics */}
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Left 7 Cols: Analytical Controls & 24-Hour Stack */}
       <div className="lg:col-span-7 space-y-6">
-        {/* Control Card */}
-        <div className="bg-gray-900/90 border border-gray-800 rounded-2xl p-5 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold flex items-center gap-2 text-white">
-              <Zap className="w-4 h-4 text-amber-400" />
-              Multimodal Dispatch & Fleet Blending Controls
+        {/* Executive KPI Strip */}
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+          <div className="p-4">
+            <div className="text-xs font-medium text-slate-500">
+              Net Driver Take-Home
+            </div>
+            <div className="text-2xl font-extrabold text-slate-900 font-mono tabular-nums mt-1">
+              ₹{dailyNetTakeHome.toLocaleString("en-IN")}
+            </div>
+            <div className="mt-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              {dailyDelta >= 0 ? `+₹${dailyDelta} vs Rides-Only` : "Baseline"}
+            </div>
+          </div>
+
+          <div className="p-4">
+            <div className="text-xs font-medium text-slate-500">
+              Hourly Earnings Floor
+            </div>
+            <div className="text-2xl font-extrabold text-slate-900 font-mono tabular-nums mt-1">
+              ₹{effectiveHourly}
+              <span className="text-sm font-normal text-slate-500">/hr</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-1.5">
+              Eliminates 11 AM–4 PM trough
+            </div>
+          </div>
+
+          <div className="p-4">
+            <div className="text-xs font-medium text-slate-500">
+              Empty Dead-Mile Ratio
+            </div>
+            <div className="text-2xl font-extrabold text-slate-900 font-mono tabular-nums mt-1">
+              {deadMileRatio}%
+            </div>
+            <div className="mt-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              -{(27.5 - deadMileRatio).toFixed(1)}% empty km
+            </div>
+          </div>
+
+          <div className="p-4">
+            <div className="text-xs font-medium text-slate-500">
+              Off-Peak Utilization
+            </div>
+            <div className="text-2xl font-extrabold text-slate-900 font-mono tabular-nums mt-1">
+              {offPeakUtil}%
+            </div>
+            <div className="text-[11px] text-slate-500 mt-1.5">
+              Active time (11 AM – 5 PM)
+            </div>
+          </div>
+        </div>
+
+        {/* Simulation Control Panel */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-5">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4 text-slate-600" />
+              Fleet & Marketplace Parameters
             </h2>
-            <span className="text-xs text-gray-400">
-              Real-time Marketplace Liquidity Simulator
+            <span className="text-xs text-slate-500">
+              Interactive Supply-Side Telemetry
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5 font-medium">
-                Fleet Vehicle Class
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Vehicle Category
               </label>
               <select
                 value={vehicle}
                 onChange={(e) => setVehicle(e.target.value as any)}
-                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-slate-900"
               >
-                <option value="2w">2-Wheeler (Bike Taxi / Scooter)</option>
-                <option value="3w">3-Wheeler (Auto / Tuk-Tuk)</option>
+                <option value="2w">2-Wheeler (Bike / Scooter)</option>
+                <option value="3w">3-Wheeler (Auto Rickshaw)</option>
                 <option value="4w">4-Wheeler (Mini / Sedan Cab)</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5 font-medium">
-                Market Geography
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                City Density Cluster
               </label>
               <select
                 value={cityTier}
                 onChange={(e) => setCityTier(e.target.value as any)}
-                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-slate-900"
               >
-                <option value="metro">Tier-1 Metro (Dense IT Corridors)</option>
+                <option value="metro">Tier-1 Metro (IT Corridors)</option>
                 <option value="tier2">Tier-2 Emerging Smart Cities</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5 font-medium">
-                Shift Hours: <strong className="text-white">{shiftHours} hrs</strong>
-              </label>
+              <div className="flex justify-between text-xs mb-1.5">
+                <span className="font-semibold text-slate-700">
+                  Shift Duration
+                </span>
+                <span className="font-mono font-bold text-slate-900">
+                  {shiftHours} hrs
+                </span>
+              </div>
               <input
                 type="range"
                 min={4}
                 max={14}
                 value={shiftHours}
                 onChange={(e) => setShiftHours(Number(e.target.value))}
-                className="w-full accent-indigo-500 cursor-pointer mt-1"
+                className="w-full mt-1.5"
               />
             </div>
           </div>
 
-          {/* Verticals Toggle Pills */}
-          <div className="pt-4 border-t border-gray-800/80">
-            <div className="text-xs font-medium text-gray-400 mb-2.5">
-              Active Cross-Dispatch Verticals (Click to toggle supply pooling):
+          {/* 3-Vertical Supply Pooling Toggles */}
+          <div className="pt-4 border-t border-slate-100">
+            <div className="text-xs font-semibold text-slate-700 mb-2.5">
+              Active Cross-Dispatch Supply Pooling (Toggle to test isolation vs multimodal):
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 onClick={() => setCoPilotActive(!coPilotActive)}
-                className={`flex items-center justify-between p-3 rounded-xl border text-left transition ${
+                className={`p-3 rounded-lg border text-left transition-all ${
                   coPilotActive
-                    ? "bg-indigo-600/15 border-indigo-500 text-white"
-                    : "bg-gray-950 border-gray-800 text-gray-400"
+                    ? "bg-slate-900 border-slate-900 text-white shadow-sm"
+                    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                <div>
-                  <div className="text-xs font-bold flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5 text-amber-400" />
-                    AI Co-Pilot Engine
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">
-                    Directional return chaining
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold">Co-Pilot Routing</span>
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      coPilotActive ? "bg-emerald-400" : "bg-slate-300"
+                    }`}
+                  />
                 </div>
-                <span
-                  className={`w-2.5 h-2.5 rounded-full ${
-                    coPilotActive ? "bg-emerald-400" : "bg-gray-600"
+                <div
+                  className={`text-[11px] mt-1 ${
+                    coPilotActive ? "text-slate-300" : "text-slate-500"
                   }`}
-                />
+                >
+                  Directional return chaining
+                </div>
               </button>
 
               <button
                 onClick={() => setFoodBatchEnabled(!foodBatchEnabled)}
-                className={`flex items-center justify-between p-3 rounded-xl border text-left transition ${
+                className={`p-3 rounded-lg border text-left transition-all ${
                   foodBatchEnabled && coPilotActive
-                    ? "bg-amber-500/15 border-amber-500/80 text-white"
-                    : "bg-gray-950 border-gray-800 text-gray-400"
+                    ? "bg-slate-900 border-slate-900 text-white shadow-sm"
+                    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                <div>
-                  <div className="text-xs font-bold flex items-center gap-1.5">
-                    <Utensils className="w-3.5 h-3.5 text-amber-400" />
-                    Zero-Comm Food Batch
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">
-                    Lunch (12-3) & Dinner (8-11)
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold">Zero-Comm Food</span>
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      foodBatchEnabled && coPilotActive
+                        ? "bg-orange-400"
+                        : "bg-slate-300"
+                    }`}
+                  />
                 </div>
-                <span
-                  className={`w-2.5 h-2.5 rounded-full ${
+                <div
+                  className={`text-[11px] mt-1 ${
                     foodBatchEnabled && coPilotActive
-                      ? "bg-amber-400"
-                      : "bg-gray-600"
+                      ? "text-slate-300"
+                      : "text-slate-500"
                   }`}
-                />
+                >
+                  Lunch (12–3) & Dinner (8–11)
+                </div>
               </button>
 
               <button
                 onClick={() => setB2bParcelEnabled(!b2bParcelEnabled)}
-                className={`flex items-center justify-between p-3 rounded-xl border text-left transition ${
+                className={`p-3 rounded-lg border text-left transition-all ${
                   b2bParcelEnabled && coPilotActive
-                    ? "bg-emerald-500/15 border-emerald-500/80 text-white"
-                    : "bg-gray-950 border-gray-800 text-gray-400"
+                    ? "bg-slate-900 border-slate-900 text-white shadow-sm"
+                    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                <div>
-                  <div className="text-xs font-bold flex items-center gap-1.5">
-                    <Package className="w-3.5 h-3.5 text-emerald-400" />
-                    Hyperlocal B2B Parcel
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">
-                    Off-peak & dead-mile filler
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold">B2B Express Parcel</span>
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      b2bParcelEnabled && coPilotActive
+                        ? "bg-teal-400"
+                        : "bg-slate-300"
+                    }`}
+                  />
                 </div>
-                <span
-                  className={`w-2.5 h-2.5 rounded-full ${
+                <div
+                  className={`text-[11px] mt-1 ${
                     b2bParcelEnabled && coPilotActive
-                      ? "bg-emerald-400"
-                      : "bg-gray-600"
+                      ? "text-slate-300"
+                      : "text-slate-500"
                   }`}
-                />
+                >
+                  Afternoon dead-mile filler
+                </div>
               </button>
             </div>
           </div>
         </div>
 
-        {/* 4 Key Marketplace KPI Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-gray-900/90 border border-gray-800 rounded-xl p-4">
-            <div className="text-xs text-gray-400">Net Driver Take-Home</div>
-            <div className="text-xl font-extrabold text-emerald-400 mt-1">
-              ₹{dailyNetTakeHome.toLocaleString("en-IN")}
-            </div>
-            <div className="text-[11px] text-emerald-400/90 font-medium mt-0.5">
-              {dailyDelta >= 0 ? `+₹${dailyDelta} vs Rides-Only` : "Baseline"}
-            </div>
-          </div>
-
-          <div className="bg-gray-900/90 border border-gray-800 rounded-xl p-4">
-            <div className="text-xs text-gray-400">Hourly Earnings Floor</div>
-            <div className="text-xl font-extrabold text-white mt-1">
-              ₹{effectiveHourly}/hr
-            </div>
-            <div className="text-[11px] text-gray-400 mt-0.5">
-              Eliminates mid-day dip
-            </div>
-          </div>
-
-          <div className="bg-gray-900/90 border border-gray-800 rounded-xl p-4">
-            <div className="text-xs text-gray-400">Empty Dead-Mile %</div>
-            <div className="text-xl font-extrabold text-amber-400 mt-1">
-              {deadMileRatio}%
-            </div>
-            <div className="text-[11px] text-emerald-400 font-medium mt-0.5">
-              {(27.5 - deadMileRatio).toFixed(1)}% fuel waste saved
-            </div>
-          </div>
-
-          <div className="bg-gray-900/90 border border-gray-800 rounded-xl p-4">
-            <div className="text-xs text-gray-400">Off-Peak Utilization</div>
-            <div className="text-xl font-extrabold text-indigo-400 mt-1">
-              {offPeakUtil}%
-            </div>
-            <div className="text-[11px] text-gray-400 mt-0.5">
-              11 AM – 5 PM active time
-            </div>
-          </div>
-        </div>
-
-        {/* Hourly Multimodal Utilization Breakdown */}
-        <div className="bg-gray-900/90 border border-gray-800 rounded-2xl p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        {/* 24-Hour Fleet Utilization & Revenue Stack */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
             <div>
-              <h3 className="text-sm font-bold text-white">
-                24-Hour Fleet Utilization & Revenue Stack by Daypart
+              <h3 className="text-sm font-bold text-slate-900">
+                Daypart Utilization & Hourly Revenue Stack
               </h3>
-              <p className="text-xs text-gray-400">
-                How Zero-Commission Food (Ownly / Eats model) & B2B Parcels fill the 11 AM – 5 PM passenger trough
+              <p className="text-xs text-slate-500 mt-0.5">
+                Cross-dispatching eliminates the 11:00 – 17:00 commuter trough via restaurant & dark-store batches
               </p>
             </div>
-            <div className="flex items-center gap-3 text-[11px]">
-              <span className="flex items-center gap-1 text-blue-400 font-medium">
-                <span className="w-2.5 h-2.5 rounded-sm bg-blue-500 inline-block" />
-                Passenger
+
+            <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-sm bg-sky-600 inline-block" />
+                Commuter Rides
               </span>
-              <span className="flex items-center gap-1 text-amber-400 font-medium">
-                <span className="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block" />
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-sm bg-orange-500 inline-block" />
                 Zero-Comm Food
               </span>
-              <span className="flex items-center gap-1 text-emerald-400 font-medium">
-                <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block" />
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-sm bg-teal-600 inline-block" />
                 B2B Parcel
               </span>
             </div>
           </div>
 
-          <div className="space-y-3.5">
+          <div className="divide-y divide-slate-100 mt-2">
             {hourlyTimeline.map((slot, idx) => {
               const slotHourly = Math.round(
                 slot.baseEarn *
-                  (1 +
-                    (slot.foodShare * 0.006 + slot.parcelShare * 0.005))
+                  (1 + slot.foodShare * 0.006 + slot.parcelShare * 0.005)
               );
               return (
-                <div key={idx} className="space-y-1.5">
+                <div key={idx} className="py-3 space-y-2">
                   <div className="flex justify-between items-center text-xs">
-                    <div>
-                      <span className="font-mono text-gray-400 mr-2">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono font-medium text-slate-500 w-24">
                         {slot.time}
                       </span>
-                      <span className="font-semibold text-gray-200">
+                      <span className="font-semibold text-slate-800">
                         {slot.label}
                       </span>
                     </div>
-                    <span className="font-bold text-emerald-400">
+                    <span className="font-mono font-bold text-slate-900 tabular-nums">
                       ₹{slotHourly}/hr
                     </span>
                   </div>
-                  <div className="w-full h-3 bg-gray-950 rounded-full overflow-hidden flex border border-gray-800">
+
+                  {/* Clean Segmented Bar */}
+                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden flex">
                     <div
                       style={{ width: `${slot.rideShare}%` }}
-                      className="bg-blue-500 h-full transition-all duration-300"
-                      title={`Passenger Rides: ${slot.rideShare}%`}
+                      className="bg-sky-600 h-full transition-all duration-300"
+                      title={`Commuter Rides: ${slot.rideShare}%`}
                     />
                     <div
                       style={{ width: `${slot.foodShare}%` }}
-                      className="bg-amber-500 h-full transition-all duration-300"
-                      title={`Zero-Commission Food Delivery: ${slot.foodShare}%`}
+                      className="bg-orange-500 h-full transition-all duration-300"
+                      title={`Zero-Commission Food: ${slot.foodShare}%`}
                     />
                     <div
                       style={{ width: `${slot.parcelShare}%` }}
-                      className="bg-emerald-500 h-full transition-all duration-300"
-                      title={`B2B Hyperlocal Parcel: ${slot.parcelShare}%`}
+                      className="bg-teal-600 h-full transition-all duration-300"
+                      title={`B2B Express Parcel: ${slot.parcelShare}%`}
                     />
                   </div>
                 </div>
@@ -362,143 +384,194 @@ export default function MultimodalSimulator({ preset }: Props) {
         </div>
       </div>
 
-      {/* Right 5 Cols: Interactive Driver App Mobile Preview */}
+      {/* Right 5 Cols: Realistic iPhone 15 Pro Driver App Preview */}
       <div className="lg:col-span-5">
-        <div className="bg-gray-900/90 border border-gray-800 rounded-2xl p-5 sticky top-6">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4 text-indigo-400" />
-              Driver Co-Pilot Mobile UX
-            </span>
-            <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-              LIVE INTERACTIVE DISPATCH
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm sticky top-24">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-900 block">
+                Driver Co-Pilot Interface
+              </span>
+              <span className="text-[11px] text-slate-500">
+                Interactive 3-Hop Directional Return Chain
+              </span>
+            </div>
+            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded bg-slate-900 text-white">
+              Live Simulation
             </span>
           </div>
 
-          {/* Mobile Phone Frame */}
-          <div className="border-4 border-gray-800 rounded-[28px] p-4 bg-gray-950 text-white shadow-2xl space-y-3.5">
-            {/* Phone Top Bar */}
-            <div className="flex justify-between items-center text-[11px] text-gray-400 border-b border-gray-800/80 pb-2.5">
-              <span className="font-extrabold text-white tracking-wide">
-                OMNIFLEET <span className="text-indigo-400">PRO</span>
-              </span>
-              <span>12:40 PM • Lunch Transition</span>
-              <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                0% Comm Pass
+          {/* Sleek iPhone Frame */}
+          <div className="mx-auto max-w-[340px] rounded-[36px] border-[8px] border-slate-900 bg-slate-900 shadow-xl overflow-hidden">
+            {/* iOS Status Bar */}
+            <div className="bg-slate-900 text-white px-5 py-2 flex items-center justify-between text-[11px] font-medium">
+              <span>12:42</span>
+              <div className="w-16 h-3.5 bg-black rounded-full" />
+              <span className="font-mono text-[10px] text-emerald-400">
+                ONLINE
               </span>
             </div>
 
-            {/* Current Context Alert */}
-            <div className="bg-gray-900 rounded-xl p-3 border border-gray-800">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-gray-400">
-                  Completed Commuter Drop
+            {/* Simulated Vector Navigation Map Header */}
+            <div className="relative h-36 bg-slate-800 overflow-hidden">
+              <svg
+                className="w-full h-full"
+                viewBox="0 0 340 140"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Background road grid */}
+                <rect width="340" height="140" fill="#1E293B" />
+                <path
+                  d="M0 30H340M0 85H340M0 120H340M60 0V140M170 0V140M280 0V140"
+                  stroke="#334155"
+                  strokeWidth="1.5"
+                />
+                {/* Route Polyline (Tech Park -> Food Hub -> Pharmacy -> Metro CBD) */}
+                <path
+                  d="M45 110 C 80 110, 105 55, 135 55 C 165 55, 200 75, 230 75 C 260 75, 280 35, 305 35"
+                  stroke="#38BDF8"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeDasharray="6 4"
+                />
+                {/* Waypoint 1: Start */}
+                <circle cx="45" cy="110" r="6" fill="#0F172A" stroke="#F8FAFC" strokeWidth="2" />
+                {/* Waypoint 2: Food Pickup */}
+                <circle cx="135" cy="55" r="6" fill="#EA580C" stroke="#FFFFFF" strokeWidth="2" />
+                {/* Waypoint 3: B2B Parcel */}
+                <circle cx="230" cy="75" r="6" fill="#0D9488" stroke="#FFFFFF" strokeWidth="2" />
+                {/* Waypoint 4: CBD Commuter */}
+                <circle cx="305" cy="35" r="7" fill="#0284C7" stroke="#FFFFFF" strokeWidth="2" />
+              </svg>
+
+              {/* Map Floating Pill */}
+              <div className="absolute top-2.5 left-3 right-3 bg-slate-900/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg border border-slate-700 flex items-center justify-between text-[11px]">
+                <span className="font-medium text-slate-300">
+                  Outer Tech Park Zone
                 </span>
-                <span className="text-[11px] font-semibold text-amber-400 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" /> Outer IT Park Zone
+                <span className="font-mono font-bold text-amber-400">
+                  Wait: 24m (Rides Only)
                 </span>
               </div>
-              <div className="text-sm font-bold mt-0.5">
-                Tech Park Phase II (Suburban Hub)
-              </div>
-              <p className="text-[11px] text-gray-400 mt-1">
-                Direct passenger return pings are low (24 min wait). Co-Pilot has constructed a <strong>Zero-Dead-Mile Multimodal Chain</strong>:
-              </p>
             </div>
 
-            {/* Co-Pilot Chain Card */}
-            <div className="bg-gradient-to-br from-indigo-950/70 via-gray-900 to-gray-900 border-2 border-indigo-500/80 rounded-2xl p-3.5 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-indigo-300 flex items-center gap-1">
-                  ⚡ 3-HOP RETURN ROUTE CHAIN
-                </span>
-                <span className="text-xs font-extrabold bg-emerald-400 text-gray-950 px-2 py-0.5 rounded-md">
-                  ₹185 Net Guaranteed
-                </span>
-              </div>
-
-              {/* Hop 1: Zero-Commission Food Delivery */}
-              <div className="bg-gray-950/90 p-2.5 rounded-xl border border-gray-800/90 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] flex items-center gap-1">
-                    <Utensils className="w-2.5 h-2.5" /> HOP 1 • ZERO-COMM FOOD BATCH
+            {/* Clean Editorial Bottom Sheet */}
+            <div className="bg-white text-slate-900 p-4 space-y-3.5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Co-Pilot Directional Chain
                   </span>
-                  <span className="text-emerald-400 font-bold text-xs">+₹75</span>
+                  <h4 className="text-sm font-extrabold text-slate-900">
+                    3-Hop Return to City Center
+                  </h4>
                 </div>
-                <div className="text-xs font-semibold text-white">
-                  Meghana Biryani Hub → 2 Drops along Main Road
-                </div>
-                <div className="text-[11px] text-gray-400">
-                  0% Merchant Commission • Direct ₹75 delivery fee paid to you • 3.1 km directional route
-                </div>
-              </div>
-
-              {/* Hop 2: B2B Pharmacy Parcel */}
-              <div className="bg-gray-950/90 p-2.5 rounded-xl border border-gray-800/90 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px] flex items-center gap-1">
-                    <Package className="w-2.5 h-2.5" /> HOP 2 • EXPRESS B2B PARCEL
+                <div className="text-right">
+                  <span className="text-xs font-extrabold font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                    ₹185 Net
                   </span>
-                  <span className="text-emerald-400 font-bold text-xs">+₹45</span>
-                </div>
-                <div className="text-xs font-semibold text-white">
-                  Apollo Dark Store → City Center Clinic
-                </div>
-                <div className="text-[11px] text-gray-400">
-                  Zero wait time (Barcode pre-scanned) • 2.4 km en route to CBD
-                </div>
-              </div>
-
-              {/* Hop 3: Pre-Matched Commuter */}
-              <div className="bg-gray-950/90 p-2.5 rounded-xl border border-gray-800/90 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold text-[10px] flex items-center gap-1">
-                    <Navigation className="w-2.5 h-2.5" /> HOP 3 • COMMUTER RIDE
+                  <span className="block text-[10px] text-slate-400 mt-0.5">
+                    0.2 km dead miles
                   </span>
-                  <span className="text-emerald-400 font-bold text-xs">+₹65</span>
-                </div>
-                <div className="text-xs font-semibold text-white">
-                  City Center Metro → Downtown Commercial Hub
-                </div>
-                <div className="text-[11px] text-gray-400">
-                  High-demand surge zone reached • 0.1 km dead miles!
                 </div>
               </div>
 
+              {/* 3 Route Hops List */}
+              <div className="space-y-2 text-xs">
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded bg-orange-100 text-orange-700 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <div>
+                      <div className="font-bold text-slate-900">
+                        Zero-Comm Restaurant Batch
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        Meghana Foods → 2 Lunch Drops (3.1 km)
+                      </div>
+                    </div>
+                  </div>
+                  <span className="font-mono font-bold text-slate-900">
+                    ₹75
+                  </span>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded bg-teal-100 text-teal-700 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <div>
+                      <div className="font-bold text-slate-900">
+                        Apollo Dark Store Express
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        B2B Medical Parcel en route (2.4 km)
+                      </div>
+                    </div>
+                  </div>
+                  <span className="font-mono font-bold text-slate-900">
+                    ₹45
+                  </span>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2">
+                    <span className="w-5 h-5 rounded bg-sky-100 text-sky-700 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <div>
+                      <div className="font-bold text-slate-900">
+                        Pre-Matched Commuter Ride
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        Ring Road Metro → Downtown CBD
+                      </div>
+                    </div>
+                  </div>
+                  <span className="font-mono font-bold text-slate-900">
+                    ₹65
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <button
                   onClick={() => setDriverActionStatus("accepted")}
-                  className="py-2.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shadow-md transition"
+                  className="py-2.5 px-3 rounded-lg font-bold text-xs bg-slate-900 hover:bg-slate-800 text-white transition shadow-sm"
                 >
-                  Accept Smart Chain
+                  Accept Chain
                 </button>
                 <button
                   onClick={() => setDriverActionStatus("declined")}
-                  className="py-2.5 rounded-xl font-medium text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 transition"
+                  className="py-2.5 px-3 rounded-lg font-semibold text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
                 >
-                  Wait for Passenger Only
+                  Decline (Wait)
                 </button>
               </div>
+
+              {/* Clean Status Banner */}
+              {driverActionStatus === "accepted" && (
+                <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-[11px] flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Route Locked:</strong> Navigating 150m to Meghana Foods. Saved <strong>7.2 empty km</strong> and guaranteed ₹185/hr.
+                  </div>
+                </div>
+              )}
+
+              {driverActionStatus === "declined" && (
+                <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Standard Queue:</strong> Waiting in suburban low-demand hex (Est. wait 24 mins or 7.2 km empty ride back).
+                  </div>
+                </div>
+              )}
             </div>
-
-            {/* Interactive Feedback Toast */}
-            {driverActionStatus === "accepted" && (
-              <div className="p-3 rounded-xl bg-emerald-950/90 border border-emerald-500/60 text-emerald-200 text-xs flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong>Chain Activated!</strong> Navigating 150m to Meghana Biryani Hub. You saved <strong>7.2 empty km</strong> and locked in ₹185/hr during off-peak lunch!
-                </div>
-              </div>
-            )}
-
-            {driverActionStatus === "declined" && (
-              <div className="p-3 rounded-xl bg-red-950/90 border border-red-500/60 text-red-200 text-xs flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong>Rides-Only Mode:</strong> You remain in a low-demand suburban hex. Estimated wait for a direct commuter is 26 mins or 7.2 km empty ride back.
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
