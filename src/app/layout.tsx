@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
 import {
-  Playfair_Display,
+  Inter,
   Plus_Jakarta_Sans,
   JetBrains_Mono,
 } from "next/font/google";
 import "./globals.css";
 
-const serif = Playfair_Display({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-serif",
-  weight: ["600", "700", "800"],
-  style: ["normal", "italic"],
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
 });
 
-const sans = Plus_Jakarta_Sans({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["500", "600", "700", "800"],
 });
 
 const mono = JetBrains_Mono({
@@ -26,9 +25,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OmniFleet — Multimodal Dispatch & Zero-Commission Fleet Recovery",
+  title: "OmniFleet — Multimodal Dispatch & Zero-Commission Fleet Recovery OS",
   description:
-    "Your fleet is bleeding out between 11 AM and 4 PM. OmniFleet recovers empty dead miles via directional food & B2B parcel chaining, and proves the EBITDA lift.",
+    "Enterprise spatial dispatch and cross-vertical SaaS pass infrastructure for ride-hailing, zero-commission food delivery, and B2B express logistics.",
 };
 
 export default function RootLayout({
@@ -39,9 +38,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${serif.variable} ${sans.variable} ${mono.variable} scroll-smooth`}
+      className={`${inter.variable} ${jakarta.variable} ${mono.variable} scroll-smooth`}
     >
-      <body className="min-h-screen bg-[#080C0A] text-[#ECE7DA] font-sans antialiased selection:bg-[#C8FF3D] selection:text-[#080C0A]">
+      <body className="min-h-screen bg-[#06080F] text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white">
         {children}
       </body>
     </html>

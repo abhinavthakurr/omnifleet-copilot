@@ -4,11 +4,26 @@
 
 @layer base {
   body {
-    background-color: #080C0A;
-    color: #ECE7DA;
+    background-color: #06080F;
+    color: #F8FAFC;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
+}
+
+/* Subtle FAANG Dot / Grid Background Utilities */
+.bg-grid-dark {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+.bg-grid-light {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
 }
 
 /* Infinite Smooth Marquee Ticker Animation */
@@ -24,7 +39,7 @@
 .animate-marquee {
   display: flex;
   width: max-content;
-  animation: marqueeScroll 28s linear infinite;
+  animation: marqueeScroll 32s linear infinite;
 }
 
 .animate-marquee:hover {
@@ -39,10 +54,10 @@
 }
 
 .animate-route-flow {
-  animation: routeFlow 1.4s linear infinite;
+  animation: routeFlow 1.2s linear infinite;
 }
 
-/* Custom subtle range slider styling */
+/* Custom FAANG-style range slider styling */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -51,29 +66,29 @@ input[type="range"] {
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(148, 163, 184, 0.22);
   height: 6px;
   border-radius: 999px;
 }
 
-.cream-slider::-webkit-slider-runnable-track {
-  background: rgba(8, 12, 10, 0.18) !important;
+.light-slider::-webkit-slider-runnable-track {
+  background: rgba(15, 23, 42, 0.12) !important;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   margin-top: -5px;
-  background-color: #C8FF3D;
-  height: 18px;
-  width: 18px;
+  background-color: #6366F1;
+  height: 16px;
+  width: 16px;
   border-radius: 999px;
-  border: 2px solid #080C0A;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.45);
   transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-  background-color: #d8ff66;
+  transform: scale(1.18);
+  background-color: #4F46E5;
 }
