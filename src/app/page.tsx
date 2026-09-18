@@ -1,24 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ArrowRight,
   Check,
-  Zap,
-  Utensils,
-  Package,
-  Navigation,
-  CheckCircle2,
-  AlertCircle,
-  Cpu,
-  GitBranch,
-  ShieldCheck,
+  Copy,
+  Download,
+  Terminal,
+  Activity,
+  ShieldAlert,
+  Layers,
+  Sparkles,
 } from "lucide-react";
 
 type PlatformPreset = "zerocomm" | "superapp" | "opennet";
+type ArchTab = "trigger" | "scoring" | "webhook" | "switchback";
 
 export default function HomePage() {
   const [activeNav, setActiveNav] = useState<string>("leak");
+  const [archTab, setArchTab] = useState<ArchTab>("trigger");
+  const [copiedApi, setCopiedApi] = useState<boolean>(false);
 
   // Interactive State for Live Dispatch Console
   const [preset, setPreset] = useState<PlatformPreset>("zerocomm");
@@ -43,6 +44,23 @@ export default function HomePage() {
   const [adoptionPct, setAdoptionPct] = useState<number>(38);
   const [netMarginPerBatch, setNetMarginPerBatch] = useState<number>(14);
   const [currencyMode, setCurrencyMode] = useState<"INR" | "USD">("INR");
+
+  // Automatic Scroll-Spy to highlight the active section in the sticky navbar
+  useEffect(() => {
+    const sectionIds = ["leak", "how-it-works", "copilot", "saas", "proof"];
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 180;
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sectionIds[i]);
+        if (el && el.offsetTop <= scrollPos) {
+          setActiveNav(sectionIds[i]);
+          break;
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Smooth scroll helper with exact sticky header offset (64px)
   const scrollToSection = (sectionId: string) => {
@@ -84,7 +102,6 @@ export default function HomePage() {
     {
       dropZone: string;
       chainTitle: string;
-      totalChainPay: number;
       passBadge: string;
       hop1: { tag: string; title: string; pay: number };
       hop2: { tag: string; title: string; pay: number };
@@ -94,7 +111,6 @@ export default function HomePage() {
     zerocomm: {
       dropZone: "Whitefield IT Park (Wait: 26m)",
       chainTitle: "Rapido Captain + Ownly Food Chain",
-      totalChainPay: 185,
       passBadge: "₹19 Daily Pass (100% Rebated)",
       hop1: {
         tag: "HOP 1 • OWNLY ZERO-COMM FOOD BATCH",
@@ -115,7 +131,6 @@ export default function HomePage() {
     superapp: {
       dropZone: "Outer Airport Tech Corridor (Wait: 22m)",
       chainTitle: "Uber Driver + Eats + Direct Chain",
-      totalChainPay: 360,
       passBadge: "Quest + Eats Surge Boost",
       hop1: {
         tag: "HOP 1 • UBER EATS PRIORITY BATCH",
@@ -136,7 +151,6 @@ export default function HomePage() {
     opennet: {
       dropZone: "Electronic City Phase II (Wait: 28m)",
       chainTitle: "ONDC Open Grid 0%-Commission Chain",
-      totalChainPay: 215,
       passBadge: "₹0 Upfront • Direct UPI Settlement",
       hop1: {
         tag: "HOP 1 • ONDC DIRECT RESTAURANT ORDER",
@@ -157,6 +171,12 @@ export default function HomePage() {
   };
 
   const activeHops = presetHopsData[preset];
+
+  // Dynamic total chain pay based on enabled toggles
+  const dynamicChainPay =
+    (coPilotActive && foodBatchEnabled ? activeHops.hop1.pay : 0) +
+    (coPilotActive && b2bParcelEnabled ? activeHops.hop2.pay : 0) +
+    activeHops.hop3.pay;
 
   // --- Dynamic Calculations for Live Dispatch Console ---
   const baseHourlyMap = { "2w": 105, "3w": 152, "4w": 225 };
@@ -182,7 +202,9 @@ export default function HomePage() {
     driverActionStatus === "accepted" && coPilotActive
       ? b2bParcelEnabled && foodBatchEnabled
         ? 9.4
-        : 14.2
+        : foodBatchEnabled || b2bParcelEnabled
+        ? 14.2
+        : 21.0
       : 27.5;
 
   // 10-point hourly curve for SVG Area Chart
@@ -277,6 +299,80 @@ export default function HomePage() {
       ? `₹${valCr.toFixed(1)} Cr`
       : `$${(valCr * 1.18).toFixed(1)}M`;
 
+  // Export Executive P&L CSV
+  const handleExportCsv = () => {
+    const rows = [
+      ["OmniFleet Enterprise P&L Unit Economics Report"],
+      ["Active Fleet DAU", fleetDau.toString()],
+      ["Co-Pilot Adoption Rate (%)", `${adoptionPct}%`],
+      ["Net B2B Tech Margin per Batch (INR)", `Rs ${netMarginPerBatch}`],
+      ["Off-Peak Batches per Driver", offPeakFoodDrops.toString()],
+      [],
+      [
+        "P&L Line Item",
+        "Siloed Holdout",
+        "With OmniFleet Active",
+        "Annualized Net Lift",
+      ],
+      [
+        "Off-Peak Food & B2B Logistics Tech Margin",
+        "0",
+        formatVal(annualLogisticsCr),
+        `+${formatVal(annualLogisticsCr)}`,
+      ],
+      [
+        "Retained Daily SaaS Pass Subscribers",
+        `${basePassDrivers} DAU (62%)`,
+        `${newPassDrivers} DAU (76%)`,
+        `+${formatVal(annualPassCr)}`,
+      ],
+      [
+        "TOTAL NET CONTRIBUTION MARGIN LIFT",
+        "Holdout Baseline",
+        "Multimodal Fleet OS",
+        `+${formatVal(totalAnnualCr)}`,
+      ],
+    ];
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      rows.map((e) => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `omnifleet_pnl_${fleetDau}_dau_${currencyMode.toLowerCase()}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Sample Dispatch Webhook Payload
+  const sampleApiJson = `{
+  "dispatch_id": "dsp_h3_88618924bffffff",
+  "corridor_preset": "${preset.toUpperCase()}",
+  "driver_state": {
+    "vehicle_type": "${vehicle.toUpperCase()}",
+    "drop_hex": "88618924bffffff",
+    "expected_commuter_wait_sec": 1560,
+    "active_pass_tier": "FLEX_CAP_ZERO_UPFRONT"
+  },
+  "chained_vector_route": [
+    { "hop": 1, "vertical": "FOOD_ZERO_COMM", "pay_inr": ${activeHops.hop1.pay}, "pass_rebate_inr": 8 },
+    { "hop": 2, "vertical": "B2B_EXPRESS_PARCEL", "pay_inr": ${activeHops.hop2.pay}, "pass_rebate_inr": 8 },
+    { "hop": 3, "vertical": "COMMUTER_SURGE_RIDE", "pay_inr": ${activeHops.hop3.pay}, "pass_rebate_inr": 0 }
+  ],
+  "net_dead_miles_saved_km": 7.2,
+  "commuter_eta_sla_delta_sec": 9.4
+}`;
+
+  const handleCopyApi = () => {
+    navigator.clipboard.writeText(sampleApiJson);
+    setCopiedApi(true);
+    setTimeout(() => setCopiedApi(false), 2000);
+  };
+
   // Ticker items array for smooth infinite loop
   const tickerItems = [
     { badge: "27.5%", text: "empty dead miles after suburban drops" },
@@ -313,7 +409,7 @@ export default function HomePage() {
             </span>
           </button>
 
-          <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-[#ECE7DA]/70">
+          <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-[#ECE7DA]/70">
             {[
               { id: "leak", label: "The leak" },
               { id: "how-it-works", label: "How it works" },
@@ -325,10 +421,10 @@ export default function HomePage() {
                 key={item.id}
                 type="button"
                 onClick={() => scrollToSection(item.id)}
-                className={`cursor-pointer transition-colors ${
+                className={`cursor-pointer transition-colors py-1 border-b-2 ${
                   activeNav === item.id
-                    ? "text-[#C8FF3D] font-bold"
-                    : "hover:text-[#C8FF3D]"
+                    ? "text-[#C8FF3D] font-bold border-[#C8FF3D]"
+                    : "border-transparent hover:text-[#C8FF3D]"
                 }`}
               >
                 {item.label}
@@ -343,6 +439,30 @@ export default function HomePage() {
           >
             Deploy on Your Fleet →
           </button>
+        </div>
+
+        {/* Mobile Quick-Jump Subbar */}
+        <div className="flex md:hidden items-center gap-4 px-5 py-2 overflow-x-auto border-t border-white/5 text-[11px] font-mono whitespace-nowrap">
+          {[
+            { id: "leak", label: "01. The Leak" },
+            { id: "how-it-works", label: "02. Architecture" },
+            { id: "copilot", label: "03. Dispatch Console" },
+            { id: "saas", label: "04. Pass Engine" },
+            { id: "proof", label: "05. EBITDA Proof" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => scrollToSection(item.id)}
+              className={`cursor-pointer ${
+                activeNav === item.id
+                  ? "text-[#C8FF3D] font-bold underline underline-offset-4"
+                  : "text-[#ECE7DA]/60"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
       </header>
 
@@ -442,7 +562,8 @@ export default function HomePage() {
 
               <div>
                 <div className="text-[11px] font-mono uppercase tracking-wider text-[#ECE7DA]/60">
-                  RECOVERED CONTRIBUTION MARGIN • 450K FLEET DAU
+                  RECOVERED CONTRIBUTION MARGIN •{" "}
+                  {(fleetDau / 1000).toFixed(0)}K FLEET DAU
                 </div>
                 <div className="text-4xl sm:text-5xl font-extrabold font-mono text-[#C8FF3D] tracking-tight mt-1">
                   {formatVal(totalAnnualCr)}
@@ -590,10 +711,55 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+
+          {/* Field Benchmark Cohort Strip */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
+            <div className="bg-white border border-[#080C0A]/15 rounded-xl p-5 space-y-2">
+              <div className="text-[10px] font-mono font-bold uppercase text-[#FF5C35]">
+                COHORT A • OUTER IT CORRIDOR 2W
+              </div>
+              <div className="font-serif text-lg font-bold text-[#080C0A]">
+                &ldquo;After 11:30 AM in Whitefield, we wait 30 mins or ride
+                empty to Indiranagar.&rdquo;
+              </div>
+              <p className="text-xs text-[#080C0A]/70 font-mono pt-1">
+                Siloed Mid-Day EPH: <strong>₹68/hr</strong> → OmniFleet:{" "}
+                <strong className="text-[#080C0A]">₹162/hr</strong>
+              </p>
+            </div>
+
+            <div className="bg-white border border-[#080C0A]/15 rounded-xl p-5 space-y-2">
+              <div className="text-[10px] font-mono font-bold uppercase text-[#FF5C35]">
+                COHORT B • PART-TIME EVENING CAPTAIN
+              </div>
+              <div className="font-serif text-lg font-bold text-[#080C0A]">
+                &ldquo;Paying ₹29 upfront when I only do 4 rides after college
+                is too risky.&rdquo;
+              </div>
+              <p className="text-xs text-[#080C0A]/70 font-mono pt-1">
+                Upfront Pass Opt-In: <strong>24%</strong> → Flex-Cap Opt-In:{" "}
+                <strong className="text-[#080C0A]">81%</strong>
+              </p>
+            </div>
+
+            <div className="bg-white border border-[#080C0A]/15 rounded-xl p-5 space-y-2">
+              <div className="text-[10px] font-mono font-bold uppercase text-[#FF5C35]">
+                COHORT C • ZERO-COMM RESTAURANT PARTNER
+              </div>
+              <div className="font-serif text-lg font-bold text-[#080C0A]">
+                &ldquo;Lunch orders spike at 12:30 PM right when idle ride
+                captains sit 400m away.&rdquo;
+              </div>
+              <p className="text-xs text-[#080C0A]/70 font-mono pt-1">
+                Batch Fulfillment SLA: <strong>24.2 mins</strong> (Zero new
+                fleet CAC)
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* SECTION 4: "HOW IT WORKS" — DEDICATED 3-PILLAR SYSTEM ARCHITECTURE SECTION */}
+      {/* SECTION 4: "HOW IT WORKS" — DEDICATED 3-PILLAR SYSTEM ARCHITECTURE + ENGINE SPEC */}
       <section
         id="how-it-works"
         className="bg-[#080C0A] text-[#ECE7DA] py-24 border-t border-white/10 relative z-20 scroll-mt-16"
@@ -660,6 +826,176 @@ export default function HomePage() {
               </p>
             </div>
           </div>
+
+          {/* Interactive Technical Spec & Dispatch API Inspector */}
+          <div className="bg-[#101613] border border-[#233029] rounded-xl overflow-hidden">
+            <div className="border-b border-[#233029] px-6 py-4 flex flex-wrap items-center justify-between gap-4 bg-[#0c120f]">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#C8FF3D]">
+                <Terminal className="w-4 h-4" />
+                UNDER THE HOOD • DISPATCH ENGINE &amp; GUARDRAIL SPECIFICATION
+              </div>
+
+              <div className="flex flex-wrap gap-1.5">
+                {(
+                  [
+                    { id: "trigger", label: "1. H3 Trigger Logic" },
+                    { id: "scoring", label: "2. Vector Scoring Formula" },
+                    { id: "webhook", label: "3. Dispatch JSON API" },
+                    { id: "switchback", label: "4. Switchback SLA Guardrails" },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setArchTab(tab.id)}
+                    className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition cursor-pointer ${
+                      archTab === tab.id
+                        ? "bg-[#C8FF3D] text-[#080C0A]"
+                        : "bg-[#080C0A] text-[#ECE7DA]/70 hover:text-white border border-[#233029]"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-6">
+              {archTab === "trigger" && (
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                  <div className="md:col-span-7 space-y-3">
+                    <h4 className="font-serif text-2xl font-bold text-white">
+                      Suburban H3 Level-8 Dead-Zone Interceptor
+                    </h4>
+                    <p className="text-xs text-[#ECE7DA]/75 leading-relaxed">
+                      Every 5 seconds, OmniFleet computes the real-time ratio of
+                      idle drivers to incoming commuter ride requests across
+                      each H3 Level-8 cell (`~0.74 km²`). When a driver finishes
+                      a drop in a cell where{" "}
+                      <code className="text-[#C8FF3D]">
+                        E[Wait_Commuter] &gt; 720s
+                      </code>{" "}
+                      and{" "}
+                      <code className="text-[#C8FF3D]">
+                        Adjacent_Merchant_Orders &ge; 2
+                      </code>
+                      , the driver app suppresses the dead-mile return prompt
+                      and injects a pre-bundled 3-hop return chain.
+                    </p>
+                  </div>
+                  <div className="md:col-span-5 bg-[#080C0A] border border-[#233029] rounded-lg p-4 font-mono text-xs space-y-2">
+                    <div className="text-[#C8FF3D] font-bold">
+                      // H3 INTERCEPT CONDITION
+                    </div>
+                    <div className="text-[#ECE7DA]/80">
+                      IF (h3_cell.wait_sec &gt; 720) AND (time IN [11:00..16:00])
+                    </div>
+                    <div className="text-[#ECE7DA]/80">
+                      AND (commuter_surge_prob &lt; 0.18)
+                    </div>
+                    <div className="text-[#FF5C35] font-bold">
+                      → TRIGGER: MULTIMODAL_VECTOR_CHAIN()
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {archTab === "scoring" && (
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                  <div className="md:col-span-7 space-y-3">
+                    <h4 className="font-serif text-2xl font-bold text-white">
+                      Directional Cosine-Similarity Route Optimization
+                    </h4>
+                    <p className="text-xs text-[#ECE7DA]/75 leading-relaxed">
+                      Drivers hate food batches that push them deeper into low-demand
+                      peripheries. OmniFleet scores candidate chains using a
+                      directional cosine filter (`cos(θ) ≥ 0.65`) anchored
+                      strictly toward the nearest high-liquidity CBD commuter
+                      hex or the driver&apos;s registered home corridor.
+                    </p>
+                  </div>
+                  <div className="md:col-span-5 bg-[#080C0A] border border-[#233029] rounded-lg p-4 font-mono text-xs space-y-2">
+                    <div className="text-[#C8FF3D] font-bold">
+                      // CHAIN UTILITY FUNCTION
+                    </div>
+                    <div className="text-white">
+                      Score(C) = 0.45·EPH_Lift + 0.30·cos(θ_CBD) -
+                      0.15·Dead_Km + 0.10·Pass_Rebate
+                    </div>
+                    <div className="text-[#ECE7DA]/60 text-[11px] pt-1">
+                      Constraint: Max pickup detour ≤ 500m; Thermal bag NOT
+                      required for sealed ≤3.5km batches.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {archTab === "webhook" && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-[#ECE7DA]/70">
+                      POST /v1/dispatch/chain-offer • Live Payload Preview
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyApi}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#16201B] border border-[#C8FF3D]/40 text-[#C8FF3D] text-xs font-mono hover:bg-[#C8FF3D] hover:text-[#080C0A] transition cursor-pointer"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      {copiedApi ? "Copied Payload!" : "Copy JSON Payload"}
+                    </button>
+                  </div>
+                  <pre className="bg-[#080C0A] border border-[#233029] rounded-lg p-4 text-xs font-mono text-[#C8FF3D] overflow-x-auto leading-relaxed">
+                    {sampleApiJson}
+                  </pre>
+                </div>
+              )}
+
+              {archTab === "switchback" && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                  <div className="bg-[#080C0A] border border-[#233029] rounded-lg p-4 space-y-1.5">
+                    <div className="font-mono font-bold text-[#C8FF3D]">
+                      GUARDRAIL 01 • COMMUTER ETA SLA
+                    </div>
+                    <div className="font-bold text-white text-sm">
+                      Max Pickup ETA Delta &lt; +18 sec
+                    </div>
+                    <p className="text-[#ECE7DA]/70">
+                      If commuter ride demand spikes unexpectedly inside a hex,
+                      food/parcel cross-dispatch throttles to 0% within 30
+                      seconds to protect core ride-hailing reliability.
+                    </p>
+                  </div>
+                  <div className="bg-[#080C0A] border border-[#233029] rounded-lg p-4 space-y-1.5">
+                    <div className="font-mono font-bold text-[#FF5C35]">
+                      GUARDRAIL 02 • FOOD BATCH RADIUS
+                    </div>
+                    <div className="font-bold text-white text-sm">
+                      Strict ≤ 3.5 km Sub-25m Drop
+                    </div>
+                    <p className="text-[#ECE7DA]/70">
+                      2W commuter bikes without bulky thermal boxes are only
+                      assigned sealed, spill-proof neighborhood lunch batches
+                      under 3.5 km.
+                    </p>
+                  </div>
+                  <div className="bg-[#080C0A] border border-[#233029] rounded-lg p-4 space-y-1.5">
+                    <div className="font-mono font-bold text-[#38BDF8]">
+                      GUARDRAIL 03 • CAUSAL ATTRIBUTION
+                    </div>
+                    <div className="font-bold text-white text-sm">
+                      H3 Cluster × 2-Hr Switchback
+                    </div>
+                    <p className="text-[#ECE7DA]/70">
+                      Evaluated across paired suburban IT corridors (Whitefield
+                      vs. Electronic City) in 2-hour switchback windows to
+                      eliminate network interference bias.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -678,9 +1014,9 @@ export default function HomePage() {
                 Interactive Multimodal Dispatch Console
               </h2>
               <p className="text-base text-[#ECE7DA]/70 max-w-2xl">
-                Switch between network architectures below to inspect real-time
-                H3 route chaining, hourly earnings curves, and driver wallet
-                impact:
+                Switch between network architectures, vehicle classes, and shift
+                hours below to inspect real-time H3 route chaining and hourly
+                earnings recovery:
               </p>
             </div>
 
@@ -753,6 +1089,31 @@ export default function HomePage() {
                   </div>
                 </div>
 
+                {/* Shift Hours Slider */}
+                <div className="bg-[#080C0A] border border-[#233029] rounded-lg p-3.5">
+                  <div className="flex justify-between text-xs font-mono mb-2">
+                    <span className="text-[#ECE7DA]/70">
+                      ACTIVE DRIVER SHIFT DURATION:
+                    </span>
+                    <strong className="text-[#C8FF3D]">
+                      {shiftHours} Hours / Day (
+                      {shiftHours <= 5
+                        ? "Part-Time Cohort"
+                        : "Full-Time Cohort"}
+                      )
+                    </strong>
+                  </div>
+                  <input
+                    type="range"
+                    min={4}
+                    max={12}
+                    step={1}
+                    value={shiftHours}
+                    onChange={(e) => setShiftHours(Number(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+
                 {/* 3 Vertical Pooling Toggle Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-30">
                   <button
@@ -775,7 +1136,9 @@ export default function HomePage() {
                       />
                     </div>
                     <p className="text-[11px] text-[#ECE7DA]/60 mt-1">
-                      {coPilotActive ? "Active (9.4% dead km)" : "Disabled"}
+                      {coPilotActive
+                        ? `Active (${deadMileRatio}% dead km)`
+                        : "Disabled (27.5% dead km)"}
                     </p>
                   </button>
 
@@ -865,7 +1228,7 @@ export default function HomePage() {
                       ₹{effectiveHourly}/hr
                     </div>
                     <div className="text-[11px] text-[#ECE7DA]/60 font-mono">
-                      {driverActionStatus === "accepted"
+                      {driverActionStatus === "accepted" && coPilotActive
                         ? "Slump Eliminated"
                         : "Idle Slump Active"}
                     </div>
@@ -1062,8 +1425,8 @@ export default function HomePage() {
                     ) : (
                       <span className="text-[#ECE7DA]/70">
                         ⚡ <strong>12:30 PM Lunch Slump Recovery:</strong>{" "}
-                        Holdout fleets drop to ₹72/hr, while OmniFleet drivers
-                        earn{" "}
+                        Holdout fleets drop to ₹{chartData[3].baseVal}/hr, while
+                        OmniFleet drivers earn{" "}
                         <strong className="text-[#C8FF3D]">
                           ₹{chartData[3].multiVal}/hr
                         </strong>{" "}
@@ -1088,7 +1451,7 @@ export default function HomePage() {
                     </span>
                   </div>
                   <span className="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-[#C8FF3D]/15 text-[#C8FF3D] border border-[#C8FF3D]/30">
-                    {driverActionStatus === "accepted"
+                    {driverActionStatus === "accepted" && coPilotActive
                       ? "0.2 KM DEAD MILES"
                       : "7.2 KM DEAD MILES"}
                   </span>
@@ -1110,7 +1473,7 @@ export default function HomePage() {
                       <polygon points="210,105 250,105 270,140 250,175 210,175 190,140" />
                     </g>
 
-                    {driverActionStatus === "accepted" ? (
+                    {driverActionStatus === "accepted" && coPilotActive ? (
                       <>
                         <path
                           d="M55 155 C 95 155, 115 75, 155 75 C 195 75, 225 115, 265 115 C 305 115, 330 45, 365 45"
@@ -1155,7 +1518,11 @@ export default function HomePage() {
                       cx="155"
                       cy="75"
                       r="6"
-                      fill="#FF5C35"
+                      fill={
+                        foodBatchEnabled && coPilotActive
+                          ? "#FF5C35"
+                          : "#334155"
+                      }
                       stroke="#080C0A"
                       strokeWidth="2"
                     />
@@ -1163,7 +1530,11 @@ export default function HomePage() {
                       cx="265"
                       cy="115"
                       r="6"
-                      fill="#38BDF8"
+                      fill={
+                        b2bParcelEnabled && coPilotActive
+                          ? "#38BDF8"
+                          : "#334155"
+                      }
                       stroke="#080C0A"
                       strokeWidth="2"
                     />
@@ -1175,6 +1546,44 @@ export default function HomePage() {
                       stroke="#080C0A"
                       strokeWidth="2"
                     />
+
+                    {/* Map Node Labels */}
+                    <text
+                      x="35"
+                      y="175"
+                      fontSize="9"
+                      fill="#ECE7DA"
+                      fontFamily="monospace"
+                    >
+                      Drop Hex
+                    </text>
+                    <text
+                      x="130"
+                      y="62"
+                      fontSize="9"
+                      fill="#FF5C35"
+                      fontFamily="monospace"
+                    >
+                      Hop 1: Food
+                    </text>
+                    <text
+                      x="240"
+                      y="134"
+                      fontSize="9"
+                      fill="#38BDF8"
+                      fontFamily="monospace"
+                    >
+                      Hop 2: B2B
+                    </text>
+                    <text
+                      x="325"
+                      y="32"
+                      fontSize="9"
+                      fill="#C8FF3D"
+                      fontFamily="monospace"
+                    >
+                      CBD Surge
+                    </text>
                   </svg>
 
                   <div className="absolute top-3 left-3 bg-[#101613]/95 border border-[#233029] px-3 py-1 rounded text-[11px] font-mono text-[#ECE7DA]/90">
@@ -1194,7 +1603,13 @@ export default function HomePage() {
                 {/* 3 Route Hops Breakdown */}
                 <div className="p-5 space-y-4">
                   <div className="space-y-2.5 text-xs">
-                    <div className="p-3 rounded-lg bg-[#080C0A] border border-[#233029] flex items-center justify-between">
+                    <div
+                      className={`p-3 rounded-lg bg-[#080C0A] border flex items-center justify-between transition ${
+                        foodBatchEnabled && coPilotActive
+                          ? "border-[#233029]"
+                          : "border-[#233029]/40 opacity-45"
+                      }`}
+                    >
                       <div>
                         <span className="text-[10px] font-mono font-bold text-[#FF5C35] block">
                           {activeHops.hop1.tag}
@@ -1204,11 +1619,19 @@ export default function HomePage() {
                         </div>
                       </div>
                       <span className="font-mono font-bold text-[#C8FF3D] text-sm">
-                        +₹{activeHops.hop1.pay}
+                        {foodBatchEnabled && coPilotActive
+                          ? `+₹${activeHops.hop1.pay}`
+                          : "OFF"}
                       </span>
                     </div>
 
-                    <div className="p-3 rounded-lg bg-[#080C0A] border border-[#233029] flex items-center justify-between">
+                    <div
+                      className={`p-3 rounded-lg bg-[#080C0A] border flex items-center justify-between transition ${
+                        b2bParcelEnabled && coPilotActive
+                          ? "border-[#233029]"
+                          : "border-[#233029]/40 opacity-45"
+                      }`}
+                    >
                       <div>
                         <span className="text-[10px] font-mono font-bold text-[#38BDF8] block">
                           {activeHops.hop2.tag}
@@ -1218,7 +1641,9 @@ export default function HomePage() {
                         </div>
                       </div>
                       <span className="font-mono font-bold text-[#C8FF3D] text-sm">
-                        +₹{activeHops.hop2.pay}
+                        {b2bParcelEnabled && coPilotActive
+                          ? `+₹${activeHops.hop2.pay}`
+                          : "OFF"}
                       </span>
                     </div>
 
@@ -1243,9 +1668,8 @@ export default function HomePage() {
                       type="button"
                       onClick={() => {
                         setDriverActionStatus("accepted");
-                        setSessionBonus(
-                          (prev) => prev + activeHops.totalChainPay
-                        );
+                        setCoPilotActive(true);
+                        setSessionBonus((prev) => prev + dynamicChainPay);
                       }}
                       className={`py-3 px-4 rounded font-bold text-xs transition cursor-pointer ${
                         driverActionStatus === "accepted"
@@ -1253,7 +1677,7 @@ export default function HomePage() {
                           : "bg-[#16201B] text-[#C8FF3D] border border-[#C8FF3D]/40 hover:bg-[#C8FF3D] hover:text-[#080C0A]"
                       }`}
                     >
-                      Accept Chain (+₹{activeHops.totalChainPay})
+                      Accept Chain (+₹{dynamicChainPay})
                     </button>
                     <button
                       type="button"
@@ -1525,28 +1949,39 @@ export default function HomePage() {
               </h2>
             </div>
 
-            <div className="inline-flex p-1 rounded-lg bg-[#101613] border border-[#233029] relative z-30">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex p-1 rounded-lg bg-[#101613] border border-[#233029] relative z-30">
+                <button
+                  type="button"
+                  onClick={() => setCurrencyMode("INR")}
+                  className={`px-3.5 py-1.5 rounded text-xs font-bold font-mono transition cursor-pointer ${
+                    currencyMode === "INR"
+                      ? "bg-[#C8FF3D] text-[#080C0A]"
+                      : "text-[#ECE7DA]/70 hover:text-white"
+                  }`}
+                >
+                  ₹ INR Crores (India)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrencyMode("USD")}
+                  className={`px-3.5 py-1.5 rounded text-xs font-bold font-mono transition cursor-pointer ${
+                    currencyMode === "USD"
+                      ? "bg-[#C8FF3D] text-[#080C0A]"
+                      : "text-[#ECE7DA]/70 hover:text-white"
+                  }`}
+                >
+                  $ USD Millions (Global)
+                </button>
+              </div>
+
               <button
                 type="button"
-                onClick={() => setCurrencyMode("INR")}
-                className={`px-3.5 py-1.5 rounded text-xs font-bold font-mono transition cursor-pointer ${
-                  currencyMode === "INR"
-                    ? "bg-[#C8FF3D] text-[#080C0A]"
-                    : "text-[#ECE7DA]/70 hover:text-white"
-                }`}
+                onClick={handleExportCsv}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#16201B] border border-[#C8FF3D]/40 text-[#C8FF3D] text-xs font-mono font-bold hover:bg-[#C8FF3D] hover:text-[#080C0A] transition cursor-pointer"
               >
-                ₹ INR Crores (India)
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrencyMode("USD")}
-                className={`px-3.5 py-1.5 rounded text-xs font-bold font-mono transition cursor-pointer ${
-                  currencyMode === "USD"
-                    ? "bg-[#C8FF3D] text-[#080C0A]"
-                    : "text-[#ECE7DA]/70 hover:text-white"
-                }`}
-              >
-                $ USD Millions (Global)
+                <Download className="w-3.5 h-3.5" />
+                Export P&amp;L Sheet (.CSV)
               </button>
             </div>
           </div>
@@ -1607,56 +2042,60 @@ export default function HomePage() {
             </div>
 
             <div className="lg:col-span-8 bg-[#101613] border border-[#233029] rounded-xl overflow-hidden">
-              <table className="w-full text-left text-xs font-mono">
-                <thead className="bg-[#080C0A] border-b border-[#233029] text-[#ECE7DA]/60 uppercase">
-                  <tr>
-                    <th className="p-4">P&amp;L Unit Economics Line Item</th>
-                    <th className="p-4">Siloed Holdout</th>
-                    <th className="p-4">With OmniFleet Active</th>
-                    <th className="p-4">Net Annualized Lift</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#233029]">
-                  <tr>
-                    <td className="p-4 font-sans font-bold text-white">
-                      Off-Peak Food &amp; B2B Logistics Tech Margin
-                    </td>
-                    <td className="p-4 text-[#ECE7DA]/60">₹0 Cr (Unutilized)</td>
-                    <td className="p-4 text-white font-bold">
-                      {formatVal(annualLogisticsCr)} / yr
-                    </td>
-                    <td className="p-4 text-[#C8FF3D] font-bold">
-                      +{formatVal(annualLogisticsCr)} / yr
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="p-4 font-sans font-bold text-white">
-                      Retained Daily SaaS Pass Subscribers
-                    </td>
-                    <td className="p-4 text-[#ECE7DA]/60">
-                      {basePassDrivers.toLocaleString("en-IN")} DAU (62%)
-                    </td>
-                    <td className="p-4 text-white font-bold">
-                      {newPassDrivers.toLocaleString("en-IN")} DAU (76%)
-                    </td>
-                    <td className="p-4 text-[#C8FF3D] font-bold">
-                      +{formatVal(annualPassCr)} / yr
-                    </td>
-                  </tr>
-                  <tr className="bg-[#16201B]">
-                    <td className="p-4 font-sans font-extrabold text-[#C8FF3D]">
-                      TOTAL NET CONTRIBUTION MARGIN LIFT
-                    </td>
-                    <td className="p-4 text-[#ECE7DA]/60">Holdout Baseline</td>
-                    <td className="p-4 font-bold text-white">
-                      Multimodal Fleet OS
-                    </td>
-                    <td className="p-4 text-lg font-extrabold text-[#C8FF3D]">
-                      +{formatVal(totalAnnualCr)} / yr
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs font-mono">
+                  <thead className="bg-[#080C0A] border-b border-[#233029] text-[#ECE7DA]/60 uppercase">
+                    <tr>
+                      <th className="p-4">P&amp;L Unit Economics Line Item</th>
+                      <th className="p-4">Siloed Holdout</th>
+                      <th className="p-4">With OmniFleet Active</th>
+                      <th className="p-4">Net Annualized Lift</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#233029]">
+                    <tr>
+                      <td className="p-4 font-sans font-bold text-white">
+                        Off-Peak Food &amp; B2B Logistics Tech Margin
+                      </td>
+                      <td className="p-4 text-[#ECE7DA]/60">
+                        ₹0 Cr (Unutilized)
+                      </td>
+                      <td className="p-4 text-white font-bold">
+                        {formatVal(annualLogisticsCr)} / yr
+                      </td>
+                      <td className="p-4 text-[#C8FF3D] font-bold">
+                        +{formatVal(annualLogisticsCr)} / yr
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-4 font-sans font-bold text-white">
+                        Retained Daily SaaS Pass Subscribers
+                      </td>
+                      <td className="p-4 text-[#ECE7DA]/60">
+                        {basePassDrivers.toLocaleString("en-IN")} DAU (62%)
+                      </td>
+                      <td className="p-4 text-white font-bold">
+                        {newPassDrivers.toLocaleString("en-IN")} DAU (76%)
+                      </td>
+                      <td className="p-4 text-[#C8FF3D] font-bold">
+                        +{formatVal(annualPassCr)} / yr
+                      </td>
+                    </tr>
+                    <tr className="bg-[#16201B]">
+                      <td className="p-4 font-sans font-extrabold text-[#C8FF3D]">
+                        TOTAL NET CONTRIBUTION MARGIN LIFT
+                      </td>
+                      <td className="p-4 text-[#ECE7DA]/60">Holdout Baseline</td>
+                      <td className="p-4 font-bold text-white">
+                        Multimodal Fleet OS
+                      </td>
+                      <td className="p-4 text-lg font-extrabold text-[#C8FF3D]">
+                        +{formatVal(totalAnnualCr)} / yr
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
