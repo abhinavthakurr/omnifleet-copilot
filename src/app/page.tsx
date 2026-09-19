@@ -57,7 +57,11 @@ export default function HomePage() {
   useEffect(() => {
     const sectionIds = ["leak", "how-it-works", "copilot", "saas", "proof"];
     const handleScroll = () => {
-      const scrollPos = window.scrollY + 200;
+      if (window.scrollY < 350) {
+        setActiveNav("");
+        return;
+      }
+      const scrollPos = window.scrollY + 220;
       for (let i = sectionIds.length - 1; i >= 0; i--) {
         const el = document.getElementById(sectionIds[i]);
         if (el && el.offsetTop <= scrollPos) {
@@ -66,6 +70,7 @@ export default function HomePage() {
         }
       }
     };
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -75,10 +80,9 @@ export default function HomePage() {
     setActiveNav(sectionId);
     const el = document.getElementById(sectionId);
     if (el) {
-      const headerOffset = 80;
+      const headerOffset = 105;
       const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition =
-        elementPosition + window.pageYOffset - headerOffset;
+      const offsetPosition = elementPosition + window.scrollY - headerOffset;
       window.scrollTo({
         top: offsetPosition,
         behavior: "smooth",
@@ -194,10 +198,23 @@ export default function HomePage() {
   const activeHops = presetHopsData[preset];
 
   // Dynamic total chain pay based on enabled toggles
+  const isFoodOn = coPilotActive && foodBatchEnabled;
+  const isParcelOn = coPilotActive && b2bParcelEnabled;
+
   const dynamicChainPay =
-    (coPilotActive && foodBatchEnabled ? activeHops.hop1.pay : 0) +
-    (coPilotActive && b2bParcelEnabled ? activeHops.hop2.pay : 0) +
+    (isFoodOn ? activeHops.hop1.pay : 0) +
+    (isParcelOn ? activeHops.hop2.pay : 0) +
     activeHops.hop3.pay;
+
+  // Dynamic SVG path for the H3 Vector Map based on enabled hops
+  const activeSvgRoutePath =
+    isFoodOn && isParcelOn
+      ? "M55 155 C 95 155, 115 75, 155 75 C 195 75, 225 115, 265 115 C 305 115, 330 45, 365 45"
+      : isFoodOn && !isParcelOn
+      ? "M55 155 C 95 155, 115 75, 155 75 C 225 75, 295 45, 365 45"
+      : !isFoodOn && isParcelOn
+      ? "M55 155 C 125 155, 195 115, 265 115 C 310 115, 335 45, 365 45"
+      : "M55 155 L 365 45";
 
   // --- Dynamic Calculations for Live Dispatch Console ---
   const baseHourlyMap = { "2w": 105, "3w": 152, "4w": 225 };
@@ -205,10 +222,8 @@ export default function HomePage() {
     preset === "superapp" ? 1.15 : preset === "opennet" ? 1.05 : 1.0;
   const baseHourly = Math.round(baseHourlyMap[vehicle] * presetMult);
 
-  const foodBoost =
-    coPilotActive && foodBatchEnabled ? Math.round(baseHourly * 0.22) : 0;
-  const parcelBoost =
-    coPilotActive && b2bParcelEnabled ? Math.round(baseHourly * 0.16) : 0;
+  const foodBoost = isFoodOn ? Math.round(baseHourly * 0.22) : 0;
+  const parcelBoost = isParcelOn ? Math.round(baseHourly * 0.16) : 0;
 
   const effectiveHourly =
     driverActionStatus === "accepted"
@@ -221,9 +236,9 @@ export default function HomePage() {
 
   const deadMileRatio =
     driverActionStatus === "accepted" && coPilotActive
-      ? b2bParcelEnabled && foodBatchEnabled
+      ? isParcelOn && isFoodOn
         ? 9.4
-        : foodBatchEnabled || b2bParcelEnabled
+        : isFoodOn || isParcelOn
         ? 14.2
         : 21.0
       : 27.5;
@@ -304,13 +319,18 @@ export default function HomePage() {
   const m3FinalFee = Math.max(0, rawFlexFee - foodPassRebate);
   const m3Net = totalGross - m3FinalFee;
 
-  // --- Calculations for Enterprise ROI Calculator ---
+  // --- Calculations for Enterprise ROI Calculator (Dynamic with all sliders) ---
   const activeCopilotDrivers = fleetDau * (adoptionPct / 100);
   const dailyLogisticsMarginInr =
     activeCopilotDrivers * offPeakFoodDrops * netMarginPerBatch;
   const annualLogisticsCr = (dailyLogisticsMarginInr * 365) / 10000000;
-  const basePassDrivers = Math.round(fleetDau * 0.62);
-  const newPassDrivers = Math.round(fleetDau * 0.76);
+  const basePassPct = 62;
+  const newPassPct = Math.min(
+    92,
+    Math.round(basePassPct + (adoptionPct / 38) * 14)
+  );
+  const basePassDrivers = Math.round(fleetDau * (basePassPct / 100));
+  const newPassDrivers = Math.round(fleetDau * (newPassPct / 100));
   const deltaPassDrivers = newPassDrivers - basePassDrivers;
   const annualPassCr = (deltaPassDrivers * 18 * 365) / 10000000;
   const totalAnnualCr = annualLogisticsCr + annualPassCr;
@@ -343,8 +363,8 @@ export default function HomePage() {
       ],
       [
         "Retained Daily SaaS Pass Subscribers",
-        `${basePassDrivers} DAU (62%)`,
-        `${newPassDrivers} DAU (76%)`,
+        `${basePassDrivers} DAU (${basePassPct}%)`,
+        `${newPassDrivers} DAU (${newPassPct}%)`,
         `+${formatVal(annualPassCr)}`,
       ],
       [
@@ -380,18 +400,39 @@ export default function HomePage() {
     "active_pass_tier": "FLEX_CAP_ZERO_UPFRONT"
   },
   "chained_vector_route": [
-    { "hop": 1, "vertical": "FOOD_ZERO_COMM", "pay_inr": ${activeHops.hop1.pay}, "pass_rebate_inr": 8 },
-    { "hop": 2, "vertical": "B2B_EXPRESS_PARCEL", "pay_inr": ${activeHops.hop2.pay}, "pass_rebate_inr": 8 },
-    { "hop": 3, "vertical": "COMMUTER_SURGE_RIDE", "pay_inr": ${activeHops.hop3.pay}, "pass_rebate_inr": 0 }
+    { "hop": 1, "vertical": "FOOD_ZERO_COMM", "enabled": ${isFoodOn}, "pay_inr": ${
+    isFoodOn ? activeHops.hop1.pay : 0
+  }, "pass_rebate_inr": ${isFoodOn ? 8 : 0} },
+    { "hop": 2, "vertical": "B2B_EXPRESS_PARCEL", "enabled": ${isParcelOn}, "pay_inr": ${
+    isParcelOn ? activeHops.hop2.pay : 0
+  }, "pass_rebate_inr": ${isParcelOn ? 8 : 0} },
+    { "hop": 3, "vertical": "COMMUTER_SURGE_RIDE", "enabled": true, "pay_inr": ${
+      activeHops.hop3.pay
+    }, "pass_rebate_inr": 0 }
   ],
-  "net_dead_miles_saved_km": 7.2,
+  "total_chain_payout_inr": ${dynamicChainPay},
+  "net_dead_miles_saved_km": ${deadMileRatio < 15 ? 7.2 : 3.4},
   "commuter_eta_sla_delta_sec": 9.4
 }`;
 
   const handleCopyApi = () => {
-    navigator.clipboard.writeText(sampleApiJson);
-    setCopiedApi(true);
-    setTimeout(() => setCopiedApi(false), 2000);
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(sampleApiJson);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = sampleApiJson;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+      setCopiedApi(true);
+      setTimeout(() => setCopiedApi(false), 2000);
+    } catch {
+      setCopiedApi(true);
+      setTimeout(() => setCopiedApi(false), 2000);
+    }
   };
 
   const tickerItems = [
@@ -677,22 +718,30 @@ export default function HomePage() {
 
                   {/* 3-Step Visual Chain Progress */}
                   <div className="space-y-2 pt-1">
-                    <div className="flex items-center justify-between text-xs bg-white/[0.02] px-3 py-2 rounded-lg border border-white/[0.05]">
+                    <div
+                      className={`flex items-center justify-between text-xs bg-white/[0.02] px-3 py-2 rounded-lg border border-white/[0.05] ${
+                        !isFoodOn ? "opacity-45" : ""
+                      }`}
+                    >
                       <span className="flex items-center gap-2 text-slate-200">
                         <span className="w-2 h-2 rounded-full bg-amber-400" />
                         {activeHops.hop1.title.split("→")[0]}
                       </span>
                       <span className="font-mono text-emerald-400 font-semibold">
-                        +₹{activeHops.hop1.pay}
+                        {isFoodOn ? `+₹${activeHops.hop1.pay}` : "OFF"}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs bg-white/[0.02] px-3 py-2 rounded-lg border border-white/[0.05]">
+                    <div
+                      className={`flex items-center justify-between text-xs bg-white/[0.02] px-3 py-2 rounded-lg border border-white/[0.05] ${
+                        !isParcelOn ? "opacity-45" : ""
+                      }`}
+                    >
                       <span className="flex items-center gap-2 text-slate-200">
                         <span className="w-2 h-2 rounded-full bg-sky-400" />
                         {activeHops.hop2.title.split("→")[0]}
                       </span>
                       <span className="font-mono text-emerald-400 font-semibold">
-                        +₹{activeHops.hop2.pay}
+                        {isParcelOn ? `+₹${activeHops.hop2.pay}` : "OFF"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs bg-white/[0.02] px-3 py-2 rounded-lg border border-white/[0.05]">
@@ -1676,15 +1725,15 @@ export default function HomePage() {
                     {driverActionStatus === "accepted" && coPilotActive ? (
                       <>
                         <path
-                          d="M55 155 C 95 155, 115 75, 155 75 C 195 75, 225 115, 265 115 C 305 115, 330 45, 365 45"
+                          d={activeSvgRoutePath}
                           stroke="#10B981"
                           strokeWidth="3.5"
                           strokeDasharray="8 6"
                           className="animate-route-flow"
                         />
                         <circle
-                          cx="155"
-                          cy="75"
+                          cx={isFoodOn ? "155" : isParcelOn ? "265" : "365"}
+                          cy={isFoodOn ? "75" : isParcelOn ? "115" : "45"}
                           r="12"
                           fill="#10B981"
                           fillOpacity="0.25"
@@ -2276,10 +2325,12 @@ export default function HomePage() {
                         Retained Daily SaaS Pass Subscribers
                       </td>
                       <td className="p-4 text-slate-400">
-                        {basePassDrivers.toLocaleString("en-IN")} DAU (62%)
+                        {basePassDrivers.toLocaleString("en-IN")} DAU (
+                        {basePassPct}%)
                       </td>
                       <td className="p-4 text-white font-bold">
-                        {newPassDrivers.toLocaleString("en-IN")} DAU (76%)
+                        {newPassDrivers.toLocaleString("en-IN")} DAU (
+                        {newPassPct}%)
                       </td>
                       <td className="p-4 text-emerald-400 font-bold">
                         +{formatVal(annualPassCr)} / yr
