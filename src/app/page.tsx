@@ -411,21 +411,21 @@ export default function HomePage() {
     <div className="min-h-screen bg-white text-zinc-950">
       {/* CLEAN INSTITUTIONAL TOP HEADER (UBER / STRIPE / LINEAR LIGHT STYLE) */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-zinc-200">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand Identity */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-6 min-w-0">
             <button
               type="button"
               onClick={() => {
                 setMainView("product");
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="flex items-center gap-2.5 cursor-pointer text-left"
+              className="flex items-center gap-2.5 cursor-pointer text-left min-w-0"
             >
-              <div className="w-7 h-7 rounded-md bg-zinc-950 flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-7 h-7 shrink-0 rounded-md bg-zinc-950 flex items-center justify-center text-white font-bold text-xs">
                 OF
               </div>
-              <div>
+              <div className="min-w-0">
                 <span className="font-bold text-base tracking-tight text-zinc-950">
                   OmniFleet
                 </span>
@@ -436,21 +436,22 @@ export default function HomePage() {
             </button>
 
             {/* Primary Mode Switcher (Interactive Product vs. Product Description PRD) */}
-            <div className="inline-flex p-1 rounded-lg bg-zinc-100 border border-zinc-200/80">
+            <div className="inline-flex shrink-0 p-1 rounded-lg bg-zinc-100 border border-zinc-200/80">
               <button
                 type="button"
                 onClick={() => {
                   setMainView("product");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
                   mainView === "product"
                     ? "bg-white text-zinc-950 shadow-sm border border-zinc-200/60"
                     : "text-zinc-600 hover:text-zinc-950"
                 }`}
               >
-                <Sliders className="w-3.5 h-3.5" />
-                Interactive Platform
+                <Sliders className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden sm:inline">Interactive Platform</span>
+                <span className="sm:hidden">Platform</span>
               </button>
               <button
                 type="button"
@@ -458,14 +459,17 @@ export default function HomePage() {
                   setMainView("prd");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
                   mainView === "prd"
                     ? "bg-white text-zinc-950 shadow-sm border border-zinc-200/60"
                     : "text-zinc-600 hover:text-zinc-950"
                 }`}
               >
-                <FileText className="w-3.5 h-3.5" />
-                Product Description (PRD)
+                <FileText className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden sm:inline">
+                  Product Description (PRD)
+                </span>
+                <span className="sm:hidden">PRD</span>
               </button>
             </div>
           </div>
@@ -517,8 +521,8 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Right CTA */}
-          <div className="flex items-center gap-2.5">
+          {/* Right CTA — the mode switcher already covers this on phones. */}
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
             {mainView === "product" ? (
               <button
                 type="button"
@@ -526,9 +530,9 @@ export default function HomePage() {
                   setMainView("prd");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className="bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer"
+                className="bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
               >
-                <BookOpen className="w-3.5 h-3.5" />
+                <BookOpen className="w-3.5 h-3.5 shrink-0" />
                 Read Product Spec
               </button>
             ) : (
@@ -538,9 +542,9 @@ export default function HomePage() {
                   setMainView("product");
                   setTimeout(() => scrollToSection("copilot"), 50);
                 }}
-                className="bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer"
+                className="bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
               >
-                Open Live Console <ArrowRight className="w-3.5 h-3.5" />
+                Open Live Console <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             )}
           </div>
@@ -614,7 +618,7 @@ export default function HomePage() {
                   <span className="px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-zinc-800 font-semibold">
                     PRD / TECHNICAL SPECIFICATION
                   </span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span>
                     Applicable Platforms: Uber, Rapido, Ola, ONDC / Namma Yatri,
                     Grab
@@ -694,9 +698,11 @@ export default function HomePage() {
                   1. Executive Summary &amp; Strategic Context
                 </h2>
                 <p className="text-sm text-zinc-700 leading-relaxed">
-                  Mobility platforms in India and emerging markets (**Rapido,
-                  Uber, Ola, Namma Yatri / ONDC**) are undergoing two structural
-                  business model transitions:
+                  Mobility platforms in India and emerging markets (
+                  <strong className="text-zinc-950">
+                    Rapido, Uber, Ola, Namma Yatri / ONDC
+                  </strong>
+                  ) are undergoing two structural business model transitions:
                 </p>
                 <ol className="list-decimal list-inside space-y-2 text-sm text-zinc-700 leading-relaxed pl-1">
                   <li>
@@ -723,8 +729,11 @@ export default function HomePage() {
                 </ol>
                 <p className="text-sm text-zinc-700 leading-relaxed">
                   Despite owning both supply and demand across these verticals,
-                  platforms currently operate them in **isolated dispatch
-                  silos**. OmniFleet bridges this gap by turning empty suburban
+                  platforms currently operate them in{" "}
+                  <strong className="text-zinc-950">
+                    isolated dispatch silos
+                  </strong>
+                  . OmniFleet bridges this gap by turning empty suburban
                   ride drops between 11 AM and 4 PM into directional 3-hop
                   return chains—and using a share of the merchant B2B tech fee
                   to rebate the driver&apos;s daily SaaS subscription pass.
@@ -861,7 +870,11 @@ export default function HomePage() {
                 <p className="text-sm text-zinc-700 leading-relaxed">
                   OmniFleet executes a 3-stage decision pipeline whenever a
                   driver completes a commuter drop in an H3 Level-8 hexagon
-                  (`~0.74 km²`):
+                  (
+                  <code className="font-mono text-xs bg-zinc-100 border border-zinc-200 rounded px-1 py-0.5">
+                    ~0.74 km²
+                  </code>
+                  ):
                 </p>
                 <div className="p-5 rounded-xl bg-zinc-950 text-zinc-100 font-mono text-xs space-y-2">
                   <div className="text-zinc-400">
@@ -900,7 +913,8 @@ export default function HomePage() {
                 </h2>
                 <p className="text-sm text-zinc-700 leading-relaxed">
                   Instead of charging a flat ₹29 upfront fee, OmniFleet
-                  introduces the **Flex-Cap Pass**:
+                  introduces the{" "}
+                  <strong className="text-zinc-950">Flex-Cap Pass</strong>:
                 </p>
                 <ul className="list-disc list-inside space-y-1.5 text-sm text-zinc-700">
                   <li>
@@ -1393,7 +1407,11 @@ export default function HomePage() {
                         </h4>
                         <p className="text-sm text-zinc-600 leading-relaxed">
                           Every 5 seconds, OmniFleet evaluates real-time supply
-                          and demand across H3 Level-8 cells (`~0.74 km²`). When
+                          and demand across H3 Level-8 cells (
+                          <code className="font-mono text-zinc-950 font-semibold">
+                            ~0.74 km²
+                          </code>
+                          ). When
                           a driver drops a passenger in a cell where{" "}
                           <code className="font-mono text-zinc-950 font-semibold">
                             E[Wait_Commuter] &gt; 720s
