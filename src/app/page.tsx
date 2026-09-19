@@ -23,11 +23,14 @@ import {
 
 type PlatformPreset = "zerocomm" | "superapp" | "opennet";
 type ArchTab = "trigger" | "scoring" | "webhook" | "switchback";
+type DescTab = "overview" | "research" | "mechanics" | "metrics" | "pitch";
 
 export default function HomePage() {
-  const [activeNav, setActiveNav] = useState<string>("leak");
+  const [activeNav, setActiveNav] = useState<string>("");
   const [archTab, setArchTab] = useState<ArchTab>("trigger");
+  const [descTab, setDescTab] = useState<DescTab>("overview");
   const [copiedApi, setCopiedApi] = useState<boolean>(false);
+  const [copiedPitch, setCopiedPitch] = useState<boolean>(false);
 
   // Interactive State for Live Dispatch Console
   const [preset, setPreset] = useState<PlatformPreset>("zerocomm");
@@ -55,7 +58,14 @@ export default function HomePage() {
 
   // Automatic Scroll-Spy to highlight active section in floating pill navbar
   useEffect(() => {
-    const sectionIds = ["leak", "how-it-works", "copilot", "saas", "proof"];
+    const sectionIds = [
+      "description",
+      "leak",
+      "how-it-works",
+      "copilot",
+      "saas",
+      "proof",
+    ];
     const handleScroll = () => {
       if (window.scrollY < 350) {
         setActiveNav("");
@@ -495,6 +505,7 @@ export default function HomePage() {
 
           <nav className="hidden lg:flex items-center gap-1 bg-white/[0.03] p-1 rounded-xl border border-white/[0.06]">
             {[
+              { id: "description", label: "Product Description" },
               { id: "leak", label: "The Bottleneck" },
               { id: "how-it-works", label: "Architecture" },
               { id: "copilot", label: "Dispatch Console" },
@@ -519,10 +530,10 @@ export default function HomePage() {
           <div className="flex items-center gap-2.5">
             <button
               type="button"
-              onClick={() => scrollToSection("proof")}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition cursor-pointer"
+              onClick={() => scrollToSection("description")}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 transition cursor-pointer"
             >
-              ROI Calculator
+              Product Spec
             </button>
             <button
               type="button"
@@ -537,6 +548,7 @@ export default function HomePage() {
         {/* Mobile Quick-Jump Bar */}
         <div className="flex lg:hidden max-w-7xl mx-auto mt-2 rounded-xl bg-[#0B0F1C]/90 backdrop-blur-md border border-white/[0.06] items-center gap-3 px-4 py-2 overflow-x-auto text-[11px] font-mono whitespace-nowrap">
           {[
+            { id: "description", label: "00. Product Description" },
             { id: "leak", label: "01. Bottleneck" },
             { id: "how-it-works", label: "02. Architecture" },
             { id: "copilot", label: "03. Dispatch Console" },
@@ -797,6 +809,436 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+
+      {/* SECTION 2.5: INTERACTIVE PRODUCT DESCRIPTION & EXECUTIVE PRD TABBED HUB */}
+      <section
+        id="description"
+        className="bg-[#080B14] text-slate-100 py-20 border-b border-white/[0.08] scroll-mt-20"
+      >
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-8">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-mono font-semibold uppercase tracking-wider">
+                PRODUCT DESCRIPTION &amp; EXECUTIVE SPECIFICATION
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.03em] text-white">
+                How OmniFleet Unifies Mobility, Food &amp; SaaS Economics
+              </h2>
+              <p className="text-sm sm:text-base text-slate-400 max-w-2xl">
+                Select any specification tab below to explore the problem
+                discovery, user research, mathematical routing model, SLA
+                guardrails, and executive pitch summary.
+              </p>
+            </div>
+
+            {/* 5-Tab Switcher Bar */}
+            <div className="flex flex-wrap gap-1.5 bg-[#0D1322] p-1.5 rounded-xl border border-white/[0.08]">
+              {(
+                [
+                  { id: "overview", label: "1. Executive Overview" },
+                  { id: "research", label: "2. User Research" },
+                  { id: "mechanics", label: "3. Solution & Math" },
+                  { id: "metrics", label: "4. Metrics & Guardrails" },
+                  { id: "pitch", label: "5. Resume / Interview Brief" },
+                ] as const
+              ).map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setDescTab(t.id)}
+                  className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    descTab === t.id
+                      ? "bg-indigo-600 text-white shadow-md"
+                      : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tab Content Panel */}
+          <div className="rounded-2xl bg-[#0D1322] border border-white/[0.09] p-6 sm:p-8 shadow-2xl">
+            {descTab === "overview" && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="text-xs font-mono font-bold text-indigo-400 uppercase">
+                    EXECUTIVE THESIS • MULTI-PLATFORM MOBILITY INFRASTRUCTURE
+                  </div>
+                  <h3 className="text-2xl font-bold text-white">
+                    Solving the 11 AM – 4 PM Fleet Utilization Trough &amp; SaaS
+                    Pass Friction
+                  </h3>
+                  <p className="text-sm text-slate-300 leading-relaxed">
+                    Across global and Indian ride-hailing networks (
+                    <strong className="text-white">
+                      Rapido, Uber, Ola, ONDC / Namma Yatri, Grab
+                    </strong>
+                    ), commuter demand follows a bimodal curve—peaking at 9 AM
+                    and 6 PM, but collapsing by{" "}
+                    <strong className="text-amber-400">
+                      65% between 11 AM and 4 PM
+                    </strong>
+                    . Drivers who drop morning commuters in outer suburban tech
+                    parks (e.g., Whitefield, Gachibowli, Cybercity) face a{" "}
+                    <strong className="text-rose-400">
+                      27.5% empty dead-mile penalty
+                    </strong>{" "}
+                    riding back toward the city center.
+                  </p>
+                  <p className="text-sm text-slate-300 leading-relaxed">
+                    Simultaneously, platforms are shifting from 22% commissions
+                    to{" "}
+                    <strong className="text-white">
+                      Zero-Commission Daily SaaS Subscription Passes
+                    </strong>{" "}
+                    (₹19–₹29/day) and launching{" "}
+                    <strong className="text-emerald-400">
+                      Zero-Commission Food Delivery
+                    </strong>{" "}
+                    (e.g., Rapido Ownly / Uber Eats neighborhood batches).
+                    However, part-time drivers (&lt;6 rides/day) refuse to pay
+                    upfront daily pass fees due to sunk-cost risk, and ride
+                    fleets remain siloed from food/parcel dispatch.
+                  </p>
+                  <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/25 text-xs text-indigo-200 leading-relaxed">
+                    <strong className="text-white">
+                      The OmniFleet Solution:
+                    </strong>{" "}
+                    An H3 spatial routing and cross-vertical subsidy layer that
+                    automatically chains{" "}
+                    <strong>Zero-Commission Food Batches</strong> +{" "}
+                    <strong>B2B Express Parcels</strong> along a strict
+                    directional vector back to downtown commuter surge, while
+                    funding an <strong>₹8 instant pass rebate</strong> per
+                    off-peak batch so drivers pay <strong>₹0 upfront</strong>.
+                  </div>
+                </div>
+
+                <div className="lg:col-span-5 bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-4">
+                  <div className="text-xs font-mono font-bold text-emerald-400 uppercase">
+                    CROSS-PLATFORM APPLICABILITY MATRIX
+                  </div>
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                      <div className="font-bold text-white">
+                        1. Rapido (2W Bike / 3W Auto + Ownly Food)
+                      </div>
+                      <p className="text-slate-400 mt-1">
+                        Chains Ownly 0%-commission lunch drops + Rapido Local
+                        pharmacy parcels for Captains stranded in outer IT
+                        parks; rebates the ₹19 Daily Captain Pass.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                      <div className="font-bold text-white">
+                        2. Uber (Rides + Uber Eats + Uber Direct)
+                      </div>
+                      <p className="text-slate-400 mt-1">
+                        Bridges Uber Driver, Eats priority cloud-kitchen
+                        batches, and Uber Direct B2B dark-store restocks into
+                        unified Quest-eligible return chains.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                      <div className="font-bold text-white">
+                        3. ONDC / Namma Yatri Open Mobility Grid
+                      </div>
+                      <p className="text-slate-400 mt-1">
+                        Connects open-network buyer/seller logistics nodes with
+                        3W/2W driver pools using ₹0-upfront Flex-Cap micro-fees
+                        and direct UPI settlement.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {descTab === "research" && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.08] pb-4">
+                  <div>
+                    <div className="text-xs font-mono font-bold text-amber-400 uppercase">
+                      GROUND-TRUTH USER RESEARCH &amp; PERSONA DISCOVERY
+                    </div>
+                    <h3 className="text-xl font-bold text-white mt-1">
+                      Synthesized from field interviews with 2W/3W Captains &amp;
+                      Merchant Partners
+                    </h3>
+                  </div>
+                  <span className="text-xs font-mono text-slate-400">
+                    3 Core Marketplace Personas
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-3">
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                      PERSONA 01 • FULL-TIME 2W/3W CAPTAIN
+                    </span>
+                    <h4 className="text-base font-bold text-white">
+                      Ramesh (10-Hour Shift • Bengaluru)
+                    </h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      <strong>Pain Point:</strong> Drops tech workers in
+                      Whitefield by 11:15 AM. Sits idle at tea stalls for 30+
+                      minutes or rides 7.2 km empty back to Indiranagar, losing
+                      ₹45 in fuel and collapsing mid-day earnings to ₹68/hr.
+                    </p>
+                    <div className="pt-2 border-t border-white/[0.06] text-xs font-mono text-emerald-400">
+                      ✓ OmniFleet Outcome: ₹162/hr Mid-Day EPH (+138%)
+                    </div>
+                  </div>
+
+                  <div className="bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-3">
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                      PERSONA 02 • PART-TIME EVENING RIDER
+                    </span>
+                    <h4 className="text-base font-bold text-white">
+                      Karthik (4-Hour Shift • College / Gig Worker)
+                    </h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      <strong>Pain Point:</strong> Wants 0% commission but
+                      refuses to pay a flat ₹29 upfront daily pass fee because
+                      if rain or exams cut his shift to 3 rides, the upfront fee
+                      eats 35% of his take-home pay.
+                    </p>
+                    <div className="pt-2 border-t border-white/[0.06] text-xs font-mono text-emerald-400">
+                      ✓ OmniFleet Outcome: ₹0 Upfront Flex-Cap (81% Opt-In)
+                    </div>
+                  </div>
+
+                  <div className="bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-3">
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      PERSONA 03 • ZERO-COMM RESTAURANT PARTNER
+                    </span>
+                    <h4 className="text-base font-bold text-white">
+                      Independent Cloud Kitchen / Biryani Hub
+                    </h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      <strong>Pain Point:</strong> Onboards onto zero-commission
+                      food platforms (Ownly / ONDC) to escape 28% aggregator
+                      commissions, but suffers slow 42-min lunch delivery ETAs
+                      when dedicated food riders are scarce at 12:30 PM.
+                    </p>
+                    <div className="pt-2 border-t border-white/[0.06] text-xs font-mono text-emerald-400">
+                      ✓ OmniFleet Outcome: 24.2 min SLA via idle ride fleet
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {descTab === "mechanics" && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-3">
+                  <div className="text-xs font-mono font-bold text-indigo-400">
+                    MECHANIC 01 • SPATIAL TRIGGER
+                  </div>
+                  <h4 className="text-lg font-bold text-white">
+                    H3 Level-8 Dead-Zone Interceptor
+                  </h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    When a commuter trip ends in an outer suburban H3 cell
+                    between 11:00 and 16:00, the engine computes expected
+                    commuter queue time{" "}
+                    <code className="text-indigo-300">E[Wait_Commuter]</code>.
+                    If <code className="text-indigo-300">&gt; 720 sec</code>, it
+                    queries sealed food/parcel batches within a 500m pickup
+                    radius.
+                  </p>
+                </div>
+
+                <div className="bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-3">
+                  <div className="text-xs font-mono font-bold text-emerald-400">
+                    MECHANIC 02 • DIRECTIONAL VECTOR
+                  </div>
+                  <h4 className="text-lg font-bold text-white">
+                    Cosine-Filtered 3-Hop Solver
+                  </h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Every candidate hop must satisfy{" "}
+                    <code className="text-emerald-300">
+                      cos(θ_CBD) &ge; 0.65
+                    </code>{" "}
+                    toward the nearest downtown commuter surge corridor. Hop 1
+                    (Zero-Comm Lunch Batch) + Hop 2 (B2B Express Parcel) drop
+                    the driver directly at Hop 3 (Pre-matched CBD Commuter
+                    Ride).
+                  </p>
+                </div>
+
+                <div className="bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-3">
+                  <div className="text-xs font-mono font-bold text-sky-400">
+                    MECHANIC 03 • CROSS-SUBSIDY WALLET
+                  </div>
+                  <h4 className="text-lg font-bold text-white">
+                    ₹0-Upfront Flex-Cap + ₹8 Rebate
+                  </h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Drivers pay ₹0 upfront and accrue ₹3/ride (capped at
+                    ₹25/day). Each merchant pays a ₹14 B2B tech fee per batch;
+                    ₹8 is credited directly to the driver&apos;s pass ledger
+                    (making the pass 100% free after 3 drops) while the platform
+                    retains ₹6 net margin.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {descTab === "metrics" && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="text-xs font-mono font-bold text-emerald-400 uppercase">
+                    NORTH STAR METRICS &amp; EXPERIMENTATION RIGOR
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div className="p-4 rounded-xl bg-[#070A12] border border-white/[0.08]">
+                      <div className="font-mono text-indigo-400 font-bold">
+                        PRIMARY NORTH STAR
+                      </div>
+                      <div className="text-base font-bold text-white mt-1">
+                        Net Earnings Per Online Hour (Mid-Day 11 AM–4 PM)
+                      </div>
+                      <p className="text-slate-400 mt-1">
+                        Lifted from ₹72/hr baseline to ₹174/hr (+141% during
+                        peak lunch trough; +38.4% blended shift EPH).
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-[#070A12] border border-white/[0.08]">
+                      <div className="font-mono text-emerald-400 font-bold">
+                        SUPPLY EFFICIENCY METRIC
+                      </div>
+                      <div className="text-base font-bold text-white mt-1">
+                        Empty Dead-Mile Ratio (%)
+                      </div>
+                      <p className="text-slate-400 mt-1">
+                        Reduced from 27.5% uncompensated return kilometers down
+                        to 9.4% (-18.1 percentage points).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-5 bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-3 text-xs">
+                  <div className="font-mono font-bold text-rose-400 uppercase">
+                    HARD SLA GUARDRAILS (NO CANNIBALIZATION)
+                  </div>
+                  <ul className="space-y-2 text-slate-300">
+                    <li>
+                      • <strong>Commuter Pickup ETA Guardrail:</strong> Must
+                      remain within <code className="text-emerald-300">+18s</code>{" "}
+                      of holdout; auto-throttles food dispatch if ride surge
+                      exceeds 1.2x.
+                    </li>
+                    <li>
+                      • <strong>Spill-Safe Package Constraint:</strong> 2W bikes
+                      without thermal trunks only receive sealed, sub-3.5 km
+                      batches.
+                    </li>
+                    <li>
+                      • <strong>Switchback Holdout Design:</strong> Randomized
+                      across paired H3 Level-7 corridor clusters in 2-hour
+                      time-blocks over 4 weeks.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {descTab === "pitch" && (
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+                  <div>
+                    <div className="text-xs font-mono font-bold text-indigo-400 uppercase">
+                      EXECUTIVE PROJECT BRIEF • READY FOR RESUME &amp; INTERVIEWS
+                    </div>
+                    <h3 className="text-xl font-bold text-white mt-1">
+                      OmniFleet — Multimodal Spatial Dispatch &amp;
+                      Zero-Commission Fleet Recovery OS
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const summaryText = `OmniFleet — Multimodal Spatial Dispatch & Zero-Commission Fleet Recovery OS (Product Management Project by Abhinav Thakur)
+• Problem: Ride-hailing fleets (Uber, Rapido, ONDC) lose 27.5% of driven km to empty dead miles after suburban drops, while driver hourly earnings drop 62% during the 11 AM–4 PM off-peak trough and part-time drivers (<6 rides/day) churn due to flat upfront daily SaaS pass fees (₹19–₹29).
+• Solution: Designed an H3 Level-8 spatial dispatch engine that chains Zero-Commission Restaurant Batches (Ownly / Uber Eats) and B2B Express Parcels along a cosine-filtered directional vector (cos θ >= 0.65) back toward downtown commuter surge, paired with a ₹0-Upfront Flex-Cap Pass (₹3/ride capped at ₹25 minus ₹8 B2B merchant tech fee rebate per off-peak batch).
+• Quantified Impact: Lifts mid-day driver EPH by +38.4%, cuts empty dead miles from 27.5% to 9.4%, boosts part-time pass opt-in from 24% to 81%, and generates +₹222.4 Cr ($262M) in annualized net EBITDA lift across 450k fleet DAU.`;
+                      try {
+                        navigator.clipboard.writeText(summaryText);
+                      } catch {}
+                      setCopiedPitch(true);
+                      setTimeout(() => setCopiedPitch(false), 2000);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-semibold transition cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    {copiedPitch
+                      ? "Copied Executive Brief!"
+                      : "Copy Executive Summary"}
+                  </button>
+                </div>
+
+                <div className="bg-[#070A12] border border-white/[0.08] rounded-xl p-5 space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+                  <p>
+                    <strong className="text-white">• Problem Discovery:</strong>{" "}
+                    Ride-hailing fleets (Uber, Rapido, ONDC) lose{" "}
+                    <strong className="text-rose-400">
+                      27.5% of driven kilometers
+                    </strong>{" "}
+                    to empty dead miles after suburban drops, while driver
+                    hourly earnings drop{" "}
+                    <strong className="text-amber-400">
+                      62% between 11 AM and 4 PM
+                    </strong>{" "}
+                    and part-time drivers (&lt;6 rides/day) reject flat upfront
+                    daily SaaS subscription passes (₹19–₹29).
+                  </p>
+                  <p>
+                    <strong className="text-white">
+                      • Product Architecture:
+                    </strong>{" "}
+                    Built an H3 Level-8 spatial dispatch engine that chains{" "}
+                    <strong className="text-emerald-400">
+                      Zero-Commission Restaurant Batches
+                    </strong>{" "}
+                    and{" "}
+                    <strong className="text-sky-400">
+                      B2B Express Parcels
+                    </strong>{" "}
+                    along a cosine-filtered directional vector (
+                    <code className="text-indigo-300">cos θ &ge; 0.65</code>)
+                    back toward downtown commuter surge, paired with a{" "}
+                    <strong className="text-white">
+                      ₹0-Upfront Flex-Cap Pass
+                    </strong>{" "}
+                    (₹3/ride capped at ₹25 minus ₹8 B2B merchant tech fee rebate
+                    per off-peak batch).
+                  </p>
+                  <p>
+                    <strong className="text-white">• Business Impact:</strong>{" "}
+                    Increases blended driver EPH by{" "}
+                    <strong className="text-emerald-400">+38.4%</strong>,
+                    reduces empty dead miles from{" "}
+                    <strong className="text-emerald-400">27.5% to 9.4%</strong>,
+                    lifts part-time pass conversion from{" "}
+                    <strong className="text-emerald-400">24% to 81%</strong>,
+                    and unlocks{" "}
+                    <strong className="text-emerald-400">
+                      +₹222.4 Cr ($262.4M)
+                    </strong>{" "}
+                    in annualized net EBITDA across 450,000 active fleet
+                    drivers.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* SECTION 3: "THE BOTTLENECK" — CRISP STRIPE / APPLE LIGHT-MODE BENTO SECTION (#F8FAFC) */}
       <section
